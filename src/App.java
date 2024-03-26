@@ -189,12 +189,12 @@ public class App {
             int teamNumber = Integer.parseInt(params[1].split("=")[1]);
             int notesAutoSpeaker = Integer.parseInt(params[2].split("=")[1]);
             int notesAutoAmp = Integer.parseInt(params[3].split("=")[1]);
-            boolean autoMobility = params[4].split("=").length > 1;
+            int autoMobility = Integer.parseInt(params[4].split("=")[1]);
             int notesTeleopSpeaker = Integer.parseInt(params[5].split("=")[1]);
             int notesTeleopAmp = Integer.parseInt(params[6].split("=")[1]);
             int cycleTimeTeleop = Integer.parseInt(params[7].split("=")[1]);
-            boolean climbCompleted = params[8].split("=").length > 1;
-            boolean noteTrap = params[9].split("=").length > 1;
+            int climbCompleted = Integer.parseInt(params[8].split("=")[1]);
+            int noteTrap = Integer.parseInt(params[9].split("=")[1]);
 
             // Store data in the database
             storeData(matchNumber, teamNumber, notesAutoSpeaker, notesAutoAmp, autoMobility,
@@ -210,9 +210,9 @@ public class App {
         
 
         private void storeData(int matchNumber, int teamNumber, int notesAutoSpeaker,
-                               int notesAutoAmp, boolean autoMobility, int notesTeleopSpeaker,
-                               int notesTeleopAmp, int cycleTimeTeleop, boolean climbCompleted,
-                               boolean noteTrap) {
+                               int notesAutoAmp, int autoMobility, int notesTeleopSpeaker,
+                               int notesTeleopAmp, int cycleTimeTeleop, int climbCompleted,
+                               int noteTrap) {
             // Store data in the database as before
             String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
             String username = "frc2024";
@@ -228,12 +228,12 @@ public class App {
                 stmt.setInt(2, teamNumber);
                 stmt.setInt(3, notesAutoSpeaker);
                 stmt.setInt(4, notesAutoAmp);
-                stmt.setBoolean(5, autoMobility);
+                stmt.setint(5, autoMobility);
                 stmt.setInt(6, notesTeleopSpeaker);
                 stmt.setInt(7, notesTeleopAmp);
                 stmt.setInt(8, cycleTimeTeleop);
-                stmt.setBoolean(9, climbCompleted);
-                stmt.setBoolean(10, noteTrap);
+                stmt.setInt(9, climbCompleted);
+                stmt.setInt(10, noteTrap);
 
                 stmt.executeUpdate();
                 calculateAndStoreAverages();
