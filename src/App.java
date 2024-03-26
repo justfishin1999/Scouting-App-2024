@@ -13,8 +13,12 @@ public class App {
         server.createContext("/team_averages.html", new TeamAveragesHandler());
         server.createContext("/data_management.html", new DataManagementHandler());
         server.start();
+        System.out.println("**********************************");
+        System.out.println("Starting FRC Scouting App");
+        System.out.println("**********************************");
         System.out.println("Server is running on port 8000...");
         System.out.println("Server version v0.0.5 - alpha");
+        System.out.println("**********************************");
 
         // Calculate and store averages
         calculateAndStoreAverages();
@@ -73,6 +77,7 @@ public class App {
                 stmt.executeUpdate("TRUNCATE TABLE match_avg");
 
                 System.out.println("Data reset successfully!");
+                System.out.println("---------------------------------");
 
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -95,6 +100,7 @@ public class App {
                 stmt.execute(backupCommand);
 
                 System.out.println("Database backed up to: " + backupFileName);
+                System.out.println("---------------------------------");
 
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -359,6 +365,7 @@ public class App {
             String filePath = "C:\\web\\team_averages.html";
             Files.writeString(Paths.get(filePath), htmlContent.toString());
             System.out.println("Team averages published to team_averages.html");
+            System.out.println("---------------------------------");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -402,6 +409,7 @@ public class App {
             String filePath = "C:\\web\\data_management.html";
             Files.writeString(Paths.get(filePath), htmlContent);
             System.out.println("Data management page published to data_management.html");
+            System.out.println("---------------------------------");
         } catch (IOException e) {
             e.printStackTrace();
         }
