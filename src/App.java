@@ -225,12 +225,12 @@ public class App {
                 int teamNumber = rs.getInt("team_number");
                 int notesAutoSpeaker = rs.getInt("average_notes_auto_speaker");
                 int notesAutoAmp = rs.getInt("average_notes_auto_amp");
-                boolean autoMobility = rs.getBoolean("average_auto_mobility");
+                int autoMobility = rs.getInt("average_auto_mobility");
                 int notesTeleopSpeaker = rs.getInt("average_notes_teleop_speaker");
                 int notesTeleopAmp = rs.getInt("average_notes_teleop_amp");
                 int cycleTimeTeleop = rs.getInt("average_cycle_time_teleop");
-                boolean climbCompleted = rs.getBoolean("average_climb_completed");
-                boolean noteTrap = rs.getBoolean("average_note_trap");
+                int climbCompleted = rs.getInt("average_climb_completed");
+                int noteTrap = rs.getInt("average_note_trap");
 
                 htmlContent.append("<tr><td>").append(teamNumber).append("</td><td>").append(notesAutoSpeaker).append("</td>");
                 htmlContent.append("<td>").append(notesAutoAmp).append("</td><td>").append(autoMobility).append("</td>");
