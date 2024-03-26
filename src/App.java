@@ -2,6 +2,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.file.*;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 
 import com.sun.net.httpserver.*;
 
@@ -10,13 +11,114 @@ public class App {
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
         server.createContext("/", new MyHandler());
         server.createContext("/team_averages.html", new TeamAveragesHandler());
+        server.createContext("/data_management.html", new DataManagementHandler());
         server.start();
         System.out.println("Server is running on port 8000...");
-        System.out.println("Server version v0.0.4 - alpha");
+        System.out.println("Server version v0.0.5 - alpha");
 
         // Calculate and store averages
         calculateAndStoreAverages();
+        
+        publishDataManagementPage();
     }
+    static class DataManagementHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String requestMethod = exchange.getRequestMethod();
+            if ("GET".equals(requestMethod)) {
+                handleGetRequest(exchange);
+            } else if ("POST".equals(requestMethod)) {
+                handlePostRequest(exchange);
+            } else {
+                // Unsupported HTTP method
+                sendResponse(exchange, 405, "Method Not Allowed", "Unsupported HTTP method");
+            }
+        }
+
+        private void handleGetRequest(HttpExchange exchange) throws IOException {
+            // Read data_management.html and serve its contents
+            String response = readFile("data_management.html");
+            sendResponse(exchange, 200, "OK", response);
+        }
+
+        private void handlePostRequest(HttpExchange exchange) throws IOException {
+            // Get the action parameter from the request body
+            String query = new String(exchange.getRequestBody().readAllBytes());
+            String[] params = query.split("&");
+            String action = params[0].split("=")[1];
+
+            if ("reset".equals(action)) {
+                resetData();
+                sendResponse(exchange, 200, "OK", "Data reset successfully!");
+            } else if ("backup".equals(action)) {
+                backupData();
+                sendResponse(exchange, 200, "OK", "Data backed up successfully!");
+            } else {
+                sendResponse(exchange, 400, "Bad Request", "Invalid action parameter");
+            }
+        }
+
+        private void resetData() {
+            String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
+            String username = "frc2024";
+            String password = "9Ng83$#8jg83gjusdwe89";
+
+            try (Connection conn = DriverManager.getConnection(url, username, password);
+                 Statement stmt = conn.createStatement()) {
+
+                // Truncate the match_data table
+                stmt.executeUpdate("TRUNCATE TABLE match_data");
+
+                // Truncate the match_avg table
+                stmt.executeUpdate("TRUNCATE TABLE match_avg");
+
+                System.out.println("Data reset successfully!");
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private static void backupData() {
+            String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
+            String username = "frc2024";
+            String password = "9Ng83$#8jg83gjusdwe89";
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+            String backupFileName = "C:\\web\\backups\\backup_" + dateFormat.format(new Date(System.currentTimeMillis())) + ".bak";
+
+            try (Connection conn = DriverManager.getConnection(url, username, password);
+                 Statement stmt = conn.createStatement()) {
+
+                // Execute the backup command
+                String backupCommand = "BACKUP DATABASE Scout2024 TO DISK = '" + backupFileName + "'";
+                stmt.execute(backupCommand);
+
+                System.out.println("Database backed up to: " + backupFileName);
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void sendResponse(HttpExchange exchange, int statusCode, String statusMessage, String responseText) throws IOException {
+            exchange.sendResponseHeaders(statusCode, responseText.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(responseText.getBytes());
+            os.close();
+        }
+
+        private String readFile(String filePath) {
+            try {
+                byte[] encoded = Files.readAllBytes(Paths.get(filePath));
+                return new String(encoded);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "";
+            }
+        }
+    }
+
     
     static class TeamAveragesHandler implements HttpHandler {
         @Override
@@ -261,5 +363,50 @@ public class App {
             e.printStackTrace();
         }
     }
+    
+    private static void publishDataManagementPage() {
+        String htmlContent = "<html><head><title>Data Management</title>"
+                + "<style>body {font-family: Arial, sans-serif; background-color: #f0f0f0;}"
+                + ".navbar {overflow: hidden; background-color: #333;}"
+                + ".navbar a {float: left; display: block; color: #f2f2f2; text-align: center; padding: 14px 20px; text-decoration: none;}"
+                + ".navbar a:hover {background-color: #ddd; color: black;}"
+                + ".navbar .clock {float: right; color: #f2f2f2; padding: 14px 20px;}"
+                + ".container {width: 800px; margin: 20px auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);}"
+                + "h1 {text-align: center; margin-bottom: 20px;}"
+                + "form {margin-top: 20px;}"
+                + "button {margin-bottom: 10px; padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;}"
+                + "</style></head>"
+                + "<body><div class='navbar'>"
+                + "<a href='/'>Home</a>"
+                + "<a href='/team_averages.html'>Team Averages</a>"
+                + "<div class='clock' id='clock'></div>"
+                + "</div><div class='container'>"
+                + "<h1>Data Management</h1>"
+                + "<form method='post'>"
+                + "<button type='submit' name='action' value='reset'>Reset Data</button><br>"
+                + "<button type='submit' name='action' value='backup'>Backup Data</button>"
+                + "</form>"
+                + "<p>FRC Scouting App 2024 - Crescendo</p>"
+                + "<p>Version 0.0.5 - alpha</p>"
+                + "</div><script>"
+                + "function updateClock() {"
+                + "var now = new Date();"
+                + "var time = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ':' + (now.getSeconds() < 10 ? '0' : '') + now.getSeconds();"
+                + "document.getElementById('clock').textContent = 'Current Time: ' + time;"
+                + "setTimeout(updateClock, 1000);"
+                + "}"
+                + "updateClock();"
+                + "</script></body></html>";
+
+        try {
+            String filePath = "C:\\web\\data_management.html";
+            Files.writeString(Paths.get(filePath), htmlContent);
+            System.out.println("Data management page published to data_management.html");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
 }
