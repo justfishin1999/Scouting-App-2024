@@ -18,7 +18,7 @@ public class App {
         System.out.println("Starting FRC Scouting App");
         System.out.println("**********************************");
         System.out.println("Server is running on port 8000...");
-        System.out.println("Server version v0.0.6 - alpha");
+        System.out.println("Server version v0.0.8 - beta");
         System.out.println("**********************************");
 
         // Calculate and store averages
@@ -218,16 +218,16 @@ public class App {
             // Process form data as before
             String query = new String(exchange.getRequestBody().readAllBytes());
             String[] params = query.split("&");
-            int matchNumber = Integer.parseInt(params[0].split("=")[1]);
-            int teamNumber = Integer.parseInt(params[1].split("=")[1]);
-            int notesAutoSpeaker = Integer.parseInt(params[2].split("=")[1]);
-            int notesAutoAmp = Integer.parseInt(params[3].split("=")[1]);
-            int autoMobility = Integer.parseInt(params[4].split("=")[1]);
-            int notesTeleopSpeaker = Integer.parseInt(params[5].split("=")[1]);
-            int notesTeleopAmp = Integer.parseInt(params[6].split("=")[1]);
-            int defenseRanking = Integer.parseInt(params[7].split("=")[1]);
-            int climbCompleted = Integer.parseInt(params[8].split("=")[1]);
-            int noteTrap = Integer.parseInt(params[9].split("=")[1]);
+            int matchNumber = parseOrDefault(params[0].split("=")[1], 0);
+            int teamNumber = parseOrDefault(params[1].split("=")[1], 0);
+            int notesAutoSpeaker = parseOrDefault(params[2].split("=")[1], 0);
+            int notesAutoAmp = parseOrDefault(params[3].split("=")[1], 0);
+            int autoMobility = parseOrDefault(params[4].split("=")[1], 0);
+            int notesTeleopSpeaker = parseOrDefault(params[5].split("=")[1], 0);
+            int notesTeleopAmp = parseOrDefault(params[6].split("=")[1], 0);
+            int defenseRanking = parseOrDefault(params[7].split("=")[1], 0);
+            int climbCompleted = parseOrDefault(params[8].split("=")[1], 0);
+            int noteTrap = parseOrDefault(params[9].split("=")[1], 0);
 
             // Store data in the database
             storeData(matchNumber, teamNumber, notesAutoSpeaker, notesAutoAmp, autoMobility,
@@ -239,6 +239,12 @@ public class App {
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());
             os.close();
+        }
+        private int parseOrDefault(String value, int defaultValue) {
+            if (value == null || value.isEmpty()) {
+                return defaultValue;
+            }
+            return Integer.parseInt(value);
         }
         
 
@@ -252,10 +258,21 @@ public class App {
             String password = "9Ng83$#8jg83gjusdwe89";
 
             try (Connection conn = DriverManager.getConnection(url, username, password);
-                 PreparedStatement stmt = conn.prepareStatement(
-                         "INSERT INTO match_data (match_number, team_number, notes_auto_speaker, " +
-                                 "notes_auto_amp, auto_mobility, notes_teleop_speaker, notes_teleop_amp, " +
-                                 "cycle_time_teleop, climb_completed, note_trap) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+            	     PreparedStatement stmt = conn.prepareStatement(
+            	         "INSERT INTO match_data (" +
+            	         "    match_number, " +
+            	         "    team_number, " +
+            	         "    notes_auto_speaker, " +
+            	         "    notes_auto_amp, " +
+            	         "    auto_mobility, " +
+            	         "    notes_teleop_speaker, " +
+            	         "    notes_teleop_amp, " +
+            	         "    cycle_time_teleop, " +
+            	         "    climb_completed, " +
+            	         "    note_trap" +
+            	         ") VALUES (?, ?, COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0))"
+            	     )
+            	){
 
                 stmt.setInt(1, matchNumber);
                 stmt.setInt(2, teamNumber);
@@ -391,7 +408,9 @@ public class App {
         htmlContent.append("setTimeout(updateClock, 1000);");
         htmlContent.append("}");
         htmlContent.append("updateClock();");
-        htmlContent.append("</script></body></html>");
+        htmlContent.append("</script>");
+        htmlContent.append("<center><p>FRC Scouting App - V0.0.8<br>Developed by Justin F (FRC 4728) - 2024</p></center>\r\n"
+        		+ "</body></html>");
 
         // Write HTML content to team_averages.html file
         try {
