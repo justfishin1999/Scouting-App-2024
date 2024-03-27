@@ -9,302 +9,28 @@ import com.sun.net.httpserver.*;
 public class App {
     public static void main(String[] args) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
-        server.createContext("/", new MyHandler());
-        server.createContext("/team_averages.html", new TeamAveragesHandler());
-        server.createContext("/data_management.html", new DataManagementHandler());
-        server.createContext("/access_denied.html", new AccessDenied());
+        server.createContext("/", new Handlers.MyHandler());
+        server.createContext("/team_averages.html", new Handlers.TeamAveragesHandler());
+        server.createContext("/data_management.html", new Handlers.DataManagementHandler());
+        server.createContext("/access_denied.html", new Handlers.AccessDenied());
+        server.createContext("/script.js", new Handlers.javascriptHandler());
+        server.createContext("/actual_stats.html", new Handlers.statsHandler());
+        server.createContext("/script-no-pwd.js", new Handlers.javascriptHandler2());
         server.start();
         System.out.println("**********************************");
         System.out.println("Starting FRC Scouting App");
         System.out.println("**********************************");
         System.out.println("Server is running on port 8000...");
-        System.out.println("Server version v0.0.8 - beta");
+        System.out.println("Server version v0.0.9 - beta");
         System.out.println("**********************************");
 
         // Calculate and store averages
         calculateAndStoreAverages();
+        publishMatchData();
         
     }
-    static class AccessDenied implements HttpHandler {
-    	public void handle(HttpExchange exchange) throws IOException {
-            String requestMethod = exchange.getRequestMethod();
-            if ("GET".equals(requestMethod)) {
-                handleGetRequest(exchange);
-            } else {
-                // Unsupported HTTP method
-                sendResponse(exchange, 405, "Method Not Allowed", "Unsupported HTTP method");
-            }
-    	}
-        private void handleGetRequest(HttpExchange exchange) throws IOException {
-            // Read data_management.html and serve its contents
-            String response = readFile("access_denied.html");
-            sendResponse(exchange, 200, "OK", response);
-        }
-        private void sendResponse(HttpExchange exchange, int statusCode, String statusMessage, String responseText) throws IOException {
-            exchange.sendResponseHeaders(statusCode, responseText.getBytes().length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(responseText.getBytes());
-            os.close();
-        }
 
-        private String readFile(String filePath) {
-            try {
-                byte[] encoded = Files.readAllBytes(Paths.get(filePath));
-                return new String(encoded);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "";
-            }
-        }
-    	
-    }
-    static class DataManagementHandler implements HttpHandler {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            String requestMethod = exchange.getRequestMethod();
-            if ("GET".equals(requestMethod)) {
-                handleGetRequest(exchange);
-            } else if ("POST".equals(requestMethod)) {
-                handlePostRequest(exchange);
-            } else {
-                // Unsupported HTTP method
-                sendResponse(exchange, 405, "Method Not Allowed", "Unsupported HTTP method");
-            }
-        }
-
-        private void handleGetRequest(HttpExchange exchange) throws IOException {
-            // Read data_management.html and serve its contents
-            String response = readFile("data_management.html");
-            sendResponse(exchange, 200, "OK", response);
-        }
-
-        private void handlePostRequest(HttpExchange exchange) throws IOException {
-            // Get the action parameter from the request body
-            String query = new String(exchange.getRequestBody().readAllBytes());
-            String[] params = query.split("&");
-            String action = params[0].split("=")[1];
-
-            if ("reset".equals(action)) {
-                resetData();
-                sendResponse(exchange, 200, "OK", "Data reset successfully!");
-            } else if ("backup".equals(action)) {
-                backupData();
-                sendResponse(exchange, 200, "OK", "Data backed up successfully!");
-            } else {
-                sendResponse(exchange, 400, "Bad Request", "Invalid action parameter");
-            }
-        }
-
-        private void resetData() {
-            String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
-            String username = "frc2024";
-            String password = "9Ng83$#8jg83gjusdwe89";
-
-            try (Connection conn = DriverManager.getConnection(url, username, password);
-                 Statement stmt = conn.createStatement()) {
-
-                // Truncate the match_data table
-                stmt.executeUpdate("TRUNCATE TABLE match_data");
-
-                // Truncate the match_avg table
-                stmt.executeUpdate("TRUNCATE TABLE match_avg");
-
-                System.out.println("Data reset successfully!");
-                System.out.println("---------------------------------");
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        private static void backupData() {
-            String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
-            String username = "frc2024";
-            String password = "9Ng83$#8jg83gjusdwe89";
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
-            String backupFileName = "C:\\web\\backups\\backup_" + dateFormat.format(new Date(System.currentTimeMillis())) + ".bak";
-
-            try (Connection conn = DriverManager.getConnection(url, username, password);
-                 Statement stmt = conn.createStatement()) {
-
-                // Execute the backup command
-                String backupCommand = "BACKUP DATABASE Scout2024 TO DISK = '" + backupFileName + "'";
-                stmt.execute(backupCommand);
-
-                System.out.println("Database backed up to: " + backupFileName);
-                System.out.println("---------------------------------");
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        private void sendResponse(HttpExchange exchange, int statusCode, String statusMessage, String responseText) throws IOException {
-            exchange.sendResponseHeaders(statusCode, responseText.getBytes().length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(responseText.getBytes());
-            os.close();
-        }
-
-        private String readFile(String filePath) {
-            try {
-                byte[] encoded = Files.readAllBytes(Paths.get(filePath));
-                return new String(encoded);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "";
-            }
-        }
-    }
-
-    
-    static class TeamAveragesHandler implements HttpHandler {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            String requestMethod = exchange.getRequestMethod();
-            if ("GET".equals(requestMethod)) {
-                handleGetRequest(exchange);
-            } else {
-                // Unsupported HTTP method
-                sendResponse(exchange, 405, "Method Not Allowed", "Unsupported HTTP method");
-            }
-        }
-
-        private void handleGetRequest(HttpExchange exchange) throws IOException {
-            // Read team_averages.html and serve its contents
-            String response = readFile("team_averages.html");
-            sendResponse(exchange, 200, "OK", response);
-        }
-
-        private void sendResponse(HttpExchange exchange, int statusCode, String statusMessage, String responseText) throws IOException {
-            exchange.sendResponseHeaders(statusCode, responseText.getBytes().length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(responseText.getBytes());
-            os.close();
-        }
-
-        private String readFile(String filePath) {
-            try {
-                byte[] encoded = Files.readAllBytes(Paths.get(filePath));
-                return new String(encoded);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "";
-            }
-        }
-    }
-
-    static class MyHandler implements HttpHandler {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            if ("GET".equals(exchange.getRequestMethod())) {
-                handleGetRequest(exchange);
-            } else if ("POST".equals(exchange.getRequestMethod())) {
-                handlePostRequest(exchange);
-            }
-        }
-
-        private void handleGetRequest(HttpExchange exchange) throws IOException {
-            // Read index.html and serve its contents
-            String response = readFile("C:\\web\\index.html");
-            exchange.sendResponseHeaders(200, response.getBytes().length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
-        }
-
-        private void handlePostRequest(HttpExchange exchange) throws IOException {
-            // Process form data as before
-            String query = new String(exchange.getRequestBody().readAllBytes());
-            String[] params = query.split("&");
-            int matchNumber = parseOrDefault(params[0].split("=")[1], 0);
-            int teamNumber = parseOrDefault(params[1].split("=")[1], 0);
-            int notesAutoSpeaker = parseOrDefault(params[2].split("=")[1], 0);
-            int notesAutoAmp = parseOrDefault(params[3].split("=")[1], 0);
-            int autoMobility = parseOrDefault(params[4].split("=")[1], 0);
-            int notesTeleopSpeaker = parseOrDefault(params[5].split("=")[1], 0);
-            int notesTeleopAmp = parseOrDefault(params[6].split("=")[1], 0);
-            int defenseRanking = parseOrDefault(params[7].split("=")[1], 0);
-            int climbCompleted = parseOrDefault(params[8].split("=")[1], 0);
-            int noteTrap = parseOrDefault(params[9].split("=")[1], 0);
-
-            // Store data in the database
-            storeData(matchNumber, teamNumber, notesAutoSpeaker, notesAutoAmp, autoMobility,
-                    notesTeleopSpeaker, notesTeleopAmp, defenseRanking, climbCompleted, noteTrap);
-
-            // Respond to the client
-            String response = "<html><body><p>Data submitted successfully!</p><a href=\"index.html\">Back to entry</a></body></html>";
-            exchange.sendResponseHeaders(200, response.getBytes().length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
-        }
-        private int parseOrDefault(String value, int defaultValue) {
-            if (value == null || value.isEmpty()) {
-                return defaultValue;
-            }
-            return Integer.parseInt(value);
-        }
-        
-
-        private void storeData(int matchNumber, int teamNumber, int notesAutoSpeaker,
-                               int notesAutoAmp, int autoMobility, int notesTeleopSpeaker,
-                               int notesTeleopAmp, int defenseRanking, int climbCompleted,
-                               int noteTrap) {
-            // Store data in the database as before
-            String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
-            String username = "frc2024";
-            String password = "9Ng83$#8jg83gjusdwe89";
-
-            try (Connection conn = DriverManager.getConnection(url, username, password);
-            	     PreparedStatement stmt = conn.prepareStatement(
-            	         "INSERT INTO match_data (" +
-            	         "    match_number, " +
-            	         "    team_number, " +
-            	         "    notes_auto_speaker, " +
-            	         "    notes_auto_amp, " +
-            	         "    auto_mobility, " +
-            	         "    notes_teleop_speaker, " +
-            	         "    notes_teleop_amp, " +
-            	         "    cycle_time_teleop, " +
-            	         "    climb_completed, " +
-            	         "    note_trap" +
-            	         ") VALUES (?, ?, COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0))"
-            	     )
-            	){
-
-                stmt.setInt(1, matchNumber);
-                stmt.setInt(2, teamNumber);
-                stmt.setInt(3, notesAutoSpeaker);
-                stmt.setInt(4, notesAutoAmp);
-                stmt.setInt(5, autoMobility);
-                stmt.setInt(6, notesTeleopSpeaker);
-                stmt.setInt(7, notesTeleopAmp);
-                stmt.setInt(8, defenseRanking);
-                stmt.setInt(9, climbCompleted);
-                stmt.setInt(10, noteTrap);
-
-                stmt.executeUpdate();
-                calculateAndStoreAverages();
-                
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        private String readFile(String filePath) {
-            try {
-                byte[] encoded = Files.readAllBytes(Paths.get(filePath));
-                return new String(encoded);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "";
-            }
-        }
-    }
-
-    private static void calculateAndStoreAverages() {
+    public static void calculateAndStoreAverages() {
         String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
         String username = "frc2024";
         String password = "9Ng83$#8jg83gjusdwe89";
@@ -345,7 +71,7 @@ public class App {
             e.printStackTrace();
         }
     }
-    private static void publishTeamAverages() {
+    public static void publishTeamAverages() {
         String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
         String username = "frc2024";
         String password = "9Ng83$#8jg83gjusdwe89";
@@ -367,6 +93,8 @@ public class App {
         htmlContent.append("<body><div class='navbar'>");
         htmlContent.append("<a href='/'>Home</a>");
         htmlContent.append("<a href='/team_averages.html'>Team Averages</a>");
+        htmlContent.append("<a href='/actual_stats.html'>Actual Stats By Team</a>");
+        htmlContent.append("<a href='https://thebluealliance.com')>The Blue Alliance</a>");
         htmlContent.append("<div class='clock' id='clock'></div>");
         htmlContent.append("</div><div class='container'>");
         htmlContent.append("<h1>Team Averages</h1>");
@@ -400,16 +128,9 @@ public class App {
             e.printStackTrace();
         }
 
-        htmlContent.append("</table></div><script>");
-        htmlContent.append("function updateClock() {");
-        htmlContent.append("var now = new Date();");
-        htmlContent.append("var time = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ':' + (now.getSeconds() < 10 ? '0' : '') + now.getSeconds();");
-        htmlContent.append("document.getElementById('clock').textContent = 'Current Time: ' + time;");
-        htmlContent.append("setTimeout(updateClock, 1000);");
-        htmlContent.append("}");
-        htmlContent.append("updateClock();");
-        htmlContent.append("</script>");
-        htmlContent.append("<center><p>FRC Scouting App - V0.0.8<br>Developed by Justin F (FRC 4728) - 2024</p></center>\r\n"
+        htmlContent.append("</table></div>");
+        htmlContent.append("<script src='script-no-pwd.js'></script>");
+        htmlContent.append("<center><p>FRC Scouting App - V0.0.9<br>Developed by Justin F (FRC 4728) - 2024</p></center>\r\n"
         		+ "</body></html>");
 
         // Write HTML content to team_averages.html file
@@ -422,6 +143,81 @@ public class App {
             e.printStackTrace();
         }
     }
+    public static void publishMatchData() {
+        String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
+        String username = "frc2024";
+        String password = "9Ng83$#8jg83gjusdwe89";
+
+        StringBuilder htmlContent = new StringBuilder();
+        htmlContent.append("<html><head><title>Match Data</title>");
+        htmlContent.append("<style>");
+        htmlContent.append("body {font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 0;}");
+        htmlContent.append(".navbar {overflow: hidden; background-color: #333;}");
+        htmlContent.append(".navbar a {float: left; display: block; color: #f2f2f2; text-align: center; padding: 14px 20px; text-decoration: none;}");
+        htmlContent.append(".navbar a:hover {background-color: #ddd; color: black;}");
+        htmlContent.append(".navbar .clock {float: right; color: #f2f2f2; padding: 14px 20px;}");
+        htmlContent.append(".container {width: 800px; margin: 20px auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);}");
+        htmlContent.append("h1 {text-align: center; margin-bottom: 20px;}");
+        htmlContent.append("table {width: 100%; border-collapse: collapse;}");
+        htmlContent.append("th, td {padding: 8px; text-align: left; border-bottom: 1px solid #ddd;}");
+        htmlContent.append("tr:nth-child(even) {background-color: #f2f2f2;}");
+        htmlContent.append("</style></head>");
+        htmlContent.append("<body><div class='navbar'>");
+        htmlContent.append("<a href='/'>Home</a>");
+        htmlContent.append("<a href='/team_averages.html'>Team Averages</a>");
+        htmlContent.append("<a href='/actual_stats.html'>Actual Stats By Team</a>");
+        htmlContent.append("<a href='https://thebluealliance.com'>The Blue Alliance</a>");
+        htmlContent.append("<div class='clock' id='clock'></div>");
+        htmlContent.append("</div><div class='container'>");
+        htmlContent.append("<h1>Match Data</h1>");
+        htmlContent.append("<table>");
+        htmlContent.append("<tr><th>Match Number</th><th>Team Number</th><th>Notes Auto Speaker</th>");
+        htmlContent.append("<th>Notes Auto Amp</th><th>Auto Mobility</th><th>Notes Teleop Speaker</th>");
+        htmlContent.append("<th>Notes Teleop Amp</th><th>Defensive Ranking</th><th>Climb Completed</th>");
+        htmlContent.append("<th>Note Trap</th></tr>");
+
+        try (Connection conn = DriverManager.getConnection(url, username, password);
+             Statement stmt = conn.createStatement()) {
+
+            ResultSet rs = stmt.executeQuery("SELECT * FROM match_data");
+            while (rs.next()) {
+                int matchNumber = rs.getInt("match_number");
+                int teamNumber = rs.getInt("team_number");
+                double notesAutoSpeaker = rs.getDouble("notes_auto_speaker");
+                double notesAutoAmp = rs.getDouble("notes_auto_amp");
+                double autoMobility = rs.getDouble("auto_mobility");
+                double notesTeleopSpeaker = rs.getDouble("notes_teleop_speaker");
+                double notesTeleopAmp = rs.getDouble("notes_teleop_amp");
+                double cycleTimeTeleop = rs.getDouble("cycle_time_teleop");
+                double climbCompleted = rs.getDouble("climb_completed");
+                double noteTrap = rs.getDouble("note_trap");
+
+                htmlContent.append("<tr><td>").append(matchNumber).append("</td><td>").append(teamNumber).append("</td>");
+                htmlContent.append("<td>").append(notesAutoSpeaker).append("</td><td>").append(notesAutoAmp).append("</td>");
+                htmlContent.append("<td>").append(autoMobility).append("</td><td>").append(notesTeleopSpeaker).append("</td>");
+                htmlContent.append("<td>").append(notesTeleopAmp).append("</td><td>").append(cycleTimeTeleop).append("</td>");
+                htmlContent.append("<td>").append(climbCompleted).append("</td><td>").append(noteTrap).append("</td></tr>");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        htmlContent.append("</table></div>");
+        htmlContent.append("<script src='script-no-pwd.js'></script>");
+        htmlContent.append("<center><p>FRC Scouting App - V0.0.9<br>Developed by Justin F (FRC 4728) - 2024</p></center>\r\n"
+                + "</body></html>");
+
+        // Write HTML content to actual_stats.html file
+        try {
+            String filePath = "C:\\web\\actual_stats.html";
+            Files.writeString(Paths.get(filePath), htmlContent.toString());
+            System.out.println("Match data published to actual_stats.html");
+            System.out.println("---------------------------------");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 }
