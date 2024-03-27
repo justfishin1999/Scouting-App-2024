@@ -12,18 +12,51 @@ public class App {
         server.createContext("/", new MyHandler());
         server.createContext("/team_averages.html", new TeamAveragesHandler());
         server.createContext("/data_management.html", new DataManagementHandler());
+        server.createContext("/access_denied.html", new AccessDenied());
         server.start();
         System.out.println("**********************************");
         System.out.println("Starting FRC Scouting App");
         System.out.println("**********************************");
         System.out.println("Server is running on port 8000...");
-        System.out.println("Server version v0.0.5 - alpha");
+        System.out.println("Server version v0.0.6 - alpha");
         System.out.println("**********************************");
 
         // Calculate and store averages
         calculateAndStoreAverages();
         
-        publishDataManagementPage();
+    }
+    static class AccessDenied implements HttpHandler {
+    	public void handle(HttpExchange exchange) throws IOException {
+            String requestMethod = exchange.getRequestMethod();
+            if ("GET".equals(requestMethod)) {
+                handleGetRequest(exchange);
+            } else {
+                // Unsupported HTTP method
+                sendResponse(exchange, 405, "Method Not Allowed", "Unsupported HTTP method");
+            }
+    	}
+        private void handleGetRequest(HttpExchange exchange) throws IOException {
+            // Read data_management.html and serve its contents
+            String response = readFile("access_denied.html");
+            sendResponse(exchange, 200, "OK", response);
+        }
+        private void sendResponse(HttpExchange exchange, int statusCode, String statusMessage, String responseText) throws IOException {
+            exchange.sendResponseHeaders(statusCode, responseText.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(responseText.getBytes());
+            os.close();
+        }
+
+        private String readFile(String filePath) {
+            try {
+                byte[] encoded = Files.readAllBytes(Paths.get(filePath));
+                return new String(encoded);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "";
+            }
+        }
+    	
     }
     static class DataManagementHandler implements HttpHandler {
         @Override
@@ -192,13 +225,13 @@ public class App {
             int autoMobility = Integer.parseInt(params[4].split("=")[1]);
             int notesTeleopSpeaker = Integer.parseInt(params[5].split("=")[1]);
             int notesTeleopAmp = Integer.parseInt(params[6].split("=")[1]);
-            int cycleTimeTeleop = Integer.parseInt(params[7].split("=")[1]);
+            int defenseRanking = Integer.parseInt(params[7].split("=")[1]);
             int climbCompleted = Integer.parseInt(params[8].split("=")[1]);
             int noteTrap = Integer.parseInt(params[9].split("=")[1]);
 
             // Store data in the database
             storeData(matchNumber, teamNumber, notesAutoSpeaker, notesAutoAmp, autoMobility,
-                    notesTeleopSpeaker, notesTeleopAmp, cycleTimeTeleop, climbCompleted, noteTrap);
+                    notesTeleopSpeaker, notesTeleopAmp, defenseRanking, climbCompleted, noteTrap);
 
             // Respond to the client
             String response = "<html><body><p>Data submitted successfully!</p><a href=\"index.html\">Back to entry</a></body></html>";
@@ -211,7 +244,7 @@ public class App {
 
         private void storeData(int matchNumber, int teamNumber, int notesAutoSpeaker,
                                int notesAutoAmp, int autoMobility, int notesTeleopSpeaker,
-                               int notesTeleopAmp, int cycleTimeTeleop, int climbCompleted,
+                               int notesTeleopAmp, int defenseRanking, int climbCompleted,
                                int noteTrap) {
             // Store data in the database as before
             String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
@@ -228,10 +261,10 @@ public class App {
                 stmt.setInt(2, teamNumber);
                 stmt.setInt(3, notesAutoSpeaker);
                 stmt.setInt(4, notesAutoAmp);
-                stmt.setint(5, autoMobility);
+                stmt.setInt(5, autoMobility);
                 stmt.setInt(6, notesTeleopSpeaker);
                 stmt.setInt(7, notesTeleopAmp);
-                stmt.setInt(8, cycleTimeTeleop);
+                stmt.setInt(8, defenseRanking);
                 stmt.setInt(9, climbCompleted);
                 stmt.setInt(10, noteTrap);
 
@@ -303,7 +336,7 @@ public class App {
         StringBuilder htmlContent = new StringBuilder();
         htmlContent.append("<html><head><title>Team Averages</title>");
         htmlContent.append("<style>");
-        htmlContent.append("body {font-family: Arial, sans-serif; background-color: #f0f0f0;}");
+        htmlContent.append("body {font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 0;}");
         htmlContent.append(".navbar {overflow: hidden; background-color: #333;}");
         htmlContent.append(".navbar a {float: left; display: block; color: #f2f2f2; text-align: center; padding: 14px 20px; text-decoration: none;}");
         htmlContent.append(".navbar a:hover {background-color: #ddd; color: black;}");
@@ -323,7 +356,7 @@ public class App {
         htmlContent.append("<table>");
         htmlContent.append("<tr><th>Team Number</th><th>Notes Auto Speaker</th><th>Notes Auto Amp</th>");
         htmlContent.append("<th>Auto Mobility</th><th>Notes Teleop Speaker</th><th>Notes Teleop Amp</th>");
-        htmlContent.append("<th>Cycle Time Teleop</th><th>Climb Completed</th><th>Note Trap</th></tr>");
+        htmlContent.append("<th>Defensive Ranking</th><th>Climb Completed</th><th>Notes Trap</th></tr>");
 
         try (Connection conn = DriverManager.getConnection(url, username, password);
              Statement stmt = conn.createStatement()) {
@@ -331,19 +364,19 @@ public class App {
             ResultSet rs = stmt.executeQuery("SELECT * FROM match_avg");
             while (rs.next()) {
                 int teamNumber = rs.getInt("team_number");
-                int notesAutoSpeaker = rs.getInt("average_notes_auto_speaker");
-                int notesAutoAmp = rs.getInt("average_notes_auto_amp");
-                int autoMobility = rs.getInt("average_auto_mobility");
-                int notesTeleopSpeaker = rs.getInt("average_notes_teleop_speaker");
-                int notesTeleopAmp = rs.getInt("average_notes_teleop_amp");
-                int cycleTimeTeleop = rs.getInt("average_cycle_time_teleop");
-                int climbCompleted = rs.getInt("average_climb_completed");
-                int noteTrap = rs.getInt("average_note_trap");
+                double notesAutoSpeaker = rs.getDouble("average_notes_auto_speaker");
+                double notesAutoAmp = rs.getDouble("average_notes_auto_amp");
+                double autoMobility = rs.getDouble("average_auto_mobility");
+                double notesTeleopSpeaker = rs.getDouble("average_notes_teleop_speaker");
+                double notesTeleopAmp = rs.getDouble("average_notes_teleop_amp");
+                double defenseRanking = rs.getDouble("average_cycle_time_teleop");
+                double climbCompleted = rs.getDouble("average_climb_completed");
+                double noteTrap = rs.getDouble("average_note_trap");
 
                 htmlContent.append("<tr><td>").append(teamNumber).append("</td><td>").append(notesAutoSpeaker).append("</td>");
                 htmlContent.append("<td>").append(notesAutoAmp).append("</td><td>").append(autoMobility).append("</td>");
                 htmlContent.append("<td>").append(notesTeleopSpeaker).append("</td><td>").append(notesTeleopAmp).append("</td>");
-                htmlContent.append("<td>").append(cycleTimeTeleop).append("</td><td>").append(climbCompleted).append("</td>");
+                htmlContent.append("<td>").append(defenseRanking).append("</td><td>").append(climbCompleted).append("</td>");
                 htmlContent.append("<td>").append(noteTrap).append("</td></tr>");
             }
         } catch (SQLException e) {
@@ -370,51 +403,6 @@ public class App {
             e.printStackTrace();
         }
     }
-    
-    private static void publishDataManagementPage() {
-        String htmlContent = "<html><head><title>Data Management</title>"
-                + "<style>body {font-family: Arial, sans-serif; background-color: #f0f0f0;}"
-                + ".navbar {overflow: hidden; background-color: #333;}"
-                + ".navbar a {float: left; display: block; color: #f2f2f2; text-align: center; padding: 14px 20px; text-decoration: none;}"
-                + ".navbar a:hover {background-color: #ddd; color: black;}"
-                + ".navbar .clock {float: right; color: #f2f2f2; padding: 14px 20px;}"
-                + ".container {width: 800px; margin: 20px auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);}"
-                + "h1 {text-align: center; margin-bottom: 20px;}"
-                + "form {margin-top: 20px;}"
-                + "button {margin-bottom: 10px; padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;}"
-                + "</style></head>"
-                + "<body><div class='navbar'>"
-                + "<a href='/'>Home</a>"
-                + "<a href='/team_averages.html'>Team Averages</a>"
-                + "<div class='clock' id='clock'></div>"
-                + "</div><div class='container'>"
-                + "<h1>Data Management</h1>"
-                + "<form method='post'>"
-                + "<button type='submit' name='action' value='reset'>Reset Data</button><br>"
-                + "<button type='submit' name='action' value='backup'>Backup Data</button>"
-                + "</form>"
-                + "<p>FRC Scouting App 2024 - Crescendo</p>"
-                + "<p>Version 0.0.5 - alpha</p>"
-                + "</div><script>"
-                + "function updateClock() {"
-                + "var now = new Date();"
-                + "var time = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes() + ':' + (now.getSeconds() < 10 ? '0' : '') + now.getSeconds();"
-                + "document.getElementById('clock').textContent = 'Current Time: ' + time;"
-                + "setTimeout(updateClock, 1000);"
-                + "}"
-                + "updateClock();"
-                + "</script></body></html>";
-
-        try {
-            String filePath = "C:\\web\\data_management.html";
-            Files.writeString(Paths.get(filePath), htmlContent);
-            System.out.println("Data management page published to data_management.html");
-            System.out.println("---------------------------------");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 
 
 }
