@@ -16,6 +16,7 @@ public class App {
         server.createContext("/script.js", new JSHandler.javascriptHandler());
         server.createContext("/actual_stats.html", new Handlers.statsHandler());
         server.createContext("/script-no-pwd.js", new JSHandler.javascriptHandler2());
+        server.createContext("/admin.html", new PasswordAuthHandler());
         server.start();
         System.out.println("**********************************");
         System.out.println("Starting FRC Scouting App");

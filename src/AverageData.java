@@ -67,6 +67,7 @@ public class AverageData {
         htmlContent.append("<a href='/team_averages.html'>Team Averages</a>");
         htmlContent.append("<a href='/actual_stats.html'>Actual Stats By Team</a>");
         htmlContent.append("<a href='https://thebluealliance.com')>The Blue Alliance</a>");
+        htmlContent.append("<a href='/admin.html'>Admin</a>");
         htmlContent.append("<div class='clock' id='clock'></div>");
         htmlContent.append("</div><div class='container'>");
         htmlContent.append("<h1>Team Averages</h1>");
