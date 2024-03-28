@@ -6,5 +6,6 @@ public class Constants {
 	}
 	public static final class PasswordConstants{
 		public static final String PASSWORD = "R0b0t1cs2k24#";
+		public static final String APIKEY = "BBajf45PGya7yhQ8pvRebwYJeMPg6vWGUJbo7u5oWMGavWlXVrJ2iFMgqy0ExwUd";
 	}
 }

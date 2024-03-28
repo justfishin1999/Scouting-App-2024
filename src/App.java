@@ -21,7 +21,7 @@ public class App {
         System.out.println("Starting FRC Scouting App");
         System.out.println("**********************************");
         System.out.println("Server is running on port 8000...");
-        System.out.println("Server version v0.1.3 - beta");
+        System.out.println("Server version v0.1.5 - beta");
         System.out.println("**********************************");
 
         // Calculate and store averages
