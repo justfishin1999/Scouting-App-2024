@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -8,7 +9,45 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+
 public class AverageData {
+	static class TeamAveragesHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String requestMethod = exchange.getRequestMethod();
+            if ("GET".equals(requestMethod)) {
+                handleGetRequest(exchange);
+            } else {
+                // Unsupported HTTP method
+                sendResponse(exchange, 405, "Method Not Allowed", "Unsupported HTTP method");
+            }
+        }
+
+        private void handleGetRequest(HttpExchange exchange) throws IOException {
+            // Read team_averages.html and serve its contents
+            String response = readFile("team_averages.html");
+            sendResponse(exchange, 200, "OK", response);
+        }
+
+        private void sendResponse(HttpExchange exchange, int statusCode, String statusMessage, String responseText) throws IOException {
+            exchange.sendResponseHeaders(statusCode, responseText.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(responseText.getBytes());
+            os.close();
+        }
+
+        private String readFile(String filePath) {
+            try {
+                byte[] encoded = Files.readAllBytes(Paths.get(filePath));
+                return new String(encoded);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "";
+            }
+        }
+    }
     public static void calculateAndStoreAverages() {
         try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
              Statement stmt = conn.createStatement()) {
@@ -66,6 +105,7 @@ public class AverageData {
         htmlContent.append("<a href='/'>Home</a>");
         htmlContent.append("<a href='/team_averages.html'>Team Averages</a>");
         htmlContent.append("<a href='/actual_stats.html'>Actual Stats By Team</a>");
+        //htmlContent.append("<a href='/teams.html'>Teams at Event</a>");
         htmlContent.append("<a href='https://thebluealliance.com')>The Blue Alliance</a>");
         htmlContent.append("<a href='/admin.html'>Admin</a>");
         htmlContent.append("<div class='clock' id='clock'></div>");
@@ -103,7 +143,7 @@ public class AverageData {
 
         htmlContent.append("</table></div>");
         htmlContent.append("<script src='script-no-pwd.js'></script>");
-        htmlContent.append("<center><p>FRC Scouting App - V0.1.1<br>Developed by Justin F (FRC 4728) - 2024</p></center>\r\n"
+        htmlContent.append("<center><p>FRC Scouting App - V0.1.2<br>Developed by Justin F (FRC 4728) - 2024</p></center>\r\n"
         		+ "</body></html>");
 
         // Write HTML content to team_averages.html file
