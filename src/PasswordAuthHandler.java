@@ -60,7 +60,7 @@ public class PasswordAuthHandler implements HttpHandler {
 
         if (password != null && Constants.PasswordConstants.PASSWORD.equals(password)) {
             // Password is correct, redirect to data_management.html
-        	String redirectResponse = "<html><head><meta http-equiv='refresh' content='0; url=/data_management.html?source=admin'></head><body></body></html>";
+        	String redirectResponse = "<html><head><meta http-equiv='refresh' content='0; url=/data_management.html?source=uo78t6irtdyugiuo6itdycygioftdiyrckgvlyfuotdiyrxfjc'></head><body></body></html>";
             sendResponse(exchange, 302, "Found", redirectResponse);
         } else {
             // Password is incorrect
