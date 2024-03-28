@@ -46,6 +46,7 @@ public class AverageData {
             e.printStackTrace();
         }
     }
+    
     public static void publishTeamAverages() {
         StringBuilder htmlContent = new StringBuilder();
         htmlContent.append("<html><head><title>Team Averages</title>");
@@ -101,7 +102,7 @@ public class AverageData {
 
         htmlContent.append("</table></div>");
         htmlContent.append("<script src='script-no-pwd.js'></script>");
-        htmlContent.append("<center><p>FRC Scouting App - V0.0.9<br>Developed by Justin F (FRC 4728) - 2024</p></center>\r\n"
+        htmlContent.append("<center><p>FRC Scouting App - V0.1.1<br>Developed by Justin F (FRC 4728) - 2024</p></center>\r\n"
         		+ "</body></html>");
 
         // Write HTML content to team_averages.html file

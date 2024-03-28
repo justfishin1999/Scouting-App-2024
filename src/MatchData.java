@@ -38,8 +38,7 @@ public class MatchData {
         htmlContent.append("<th>Note Trap</th></tr>");
 
         try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
-             Statement stmt = conn.createStatement()) {
-
+            Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery("SELECT * FROM match_data");
             while (rs.next()) {
                 int matchNumber = rs.getInt("match_number");
@@ -65,7 +64,7 @@ public class MatchData {
 
         htmlContent.append("</table></div>");
         htmlContent.append("<script src='script-no-pwd.js'></script>");
-        htmlContent.append("<center><p>FRC Scouting App - V0.0.9<br>Developed by Justin F (FRC 4728) - 2024</p></center>\r\n"
+        htmlContent.append("<center><p>FRC Scouting App - V0.1.1<br>Developed by Justin F (FRC 4728) - 2024</p></center>\r\n"
                 + "</body></html>");
 
         // Write HTML content to actual_stats.html file

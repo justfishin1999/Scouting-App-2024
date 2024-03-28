@@ -24,11 +24,13 @@ public class Handlers {
                 sendResponse(exchange, 405, "Method Not Allowed", "Unsupported HTTP method");
             }
     	}
+    	
         private void handleGetRequest(HttpExchange exchange) throws IOException {
             // Read data_management.html and serve its contents
             String response = readFile("actual_stats.html");
             sendResponse(exchange, 200, "OK", response);
         }
+        
         private void sendResponse(HttpExchange exchange, int statusCode, String statusMessage, String responseText) throws IOException {
             exchange.sendResponseHeaders(statusCode, responseText.getBytes().length);
             OutputStream os = exchange.getResponseBody();
@@ -58,11 +60,13 @@ public class Handlers {
                 sendResponse(exchange, 405, "Method Not Allowed", "Unsupported HTTP method");
             }
     	}
+    	
         private void handleGetRequest(HttpExchange exchange) throws IOException {
             // Read data_management.html and serve its contents
             String response = readFile("access_denied.html");
             sendResponse(exchange, 200, "OK", response);
         }
+        
         private void sendResponse(HttpExchange exchange, int statusCode, String statusMessage, String responseText) throws IOException {
             exchange.sendResponseHeaders(statusCode, responseText.getBytes().length);
             OutputStream os = exchange.getResponseBody();
@@ -81,6 +85,7 @@ public class Handlers {
         }
     	
     }
+    
     static class DataManagementHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -172,7 +177,6 @@ public class Handlers {
             }
         }
     }
-
     
     static class TeamAveragesHandler implements HttpHandler {
         @Override
@@ -255,6 +259,7 @@ public class Handlers {
             os.write(response.getBytes());
             os.close();
         }
+        
         private int parseOrDefault(String value, int defaultValue) {
             if (value == null || value.isEmpty()) {
                 return defaultValue;
@@ -262,7 +267,6 @@ public class Handlers {
             return Integer.parseInt(value);
         }
         
-
         private void storeData(int matchNumber, int teamNumber, int notesAutoSpeaker,
                                int notesAutoAmp, int autoMobility, int notesTeleopSpeaker,
                                int notesTeleopAmp, int defenseRanking, int climbCompleted,
@@ -284,7 +288,6 @@ public class Handlers {
             	         ") VALUES (?, ?, COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, 0))"
             	     )
             	){
-
                 stmt.setInt(1, matchNumber);
                 stmt.setInt(2, teamNumber);
                 stmt.setInt(3, notesAutoSpeaker);
@@ -295,7 +298,6 @@ public class Handlers {
                 stmt.setInt(8, defenseRanking);
                 stmt.setInt(9, climbCompleted);
                 stmt.setInt(10, noteTrap);
-
                 stmt.executeUpdate();
                 AverageData.calculateAndStoreAverages();
                 MatchData.publishMatchData();
