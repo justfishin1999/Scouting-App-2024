@@ -14,72 +14,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 public class Handlers {
-	static class javascriptHandler implements HttpHandler {
-    	public void handle(HttpExchange exchange) throws IOException {
-            String requestMethod = exchange.getRequestMethod();
-            if ("GET".equals(requestMethod)) {
-                handleGetRequest(exchange);
-            } else {
-                // Unsupported HTTP method
-                sendResponse(exchange, 405, "Method Not Allowed", "Unsupported HTTP method");
-            }
-    	}
-        private void handleGetRequest(HttpExchange exchange) throws IOException {
-            // Read data_management.html and serve its contents
-            String response = readFile("script.js");
-            sendResponse(exchange, 200, "OK", response);
-        }
-        private void sendResponse(HttpExchange exchange, int statusCode, String statusMessage, String responseText) throws IOException {
-            exchange.sendResponseHeaders(statusCode, responseText.getBytes().length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(responseText.getBytes());
-            os.close();
-        }
-
-        private String readFile(String filePath) {
-            try {
-                byte[] encoded = Files.readAllBytes(Paths.get(filePath));
-                return new String(encoded);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "";
-            }
-        }
-    	
-    }
-    static class javascriptHandler2 implements HttpHandler {
-    	public void handle(HttpExchange exchange) throws IOException {
-            String requestMethod = exchange.getRequestMethod();
-            if ("GET".equals(requestMethod)) {
-                handleGetRequest(exchange);
-            } else {
-                // Unsupported HTTP method
-                sendResponse(exchange, 405, "Method Not Allowed", "Unsupported HTTP method");
-            }
-    	}
-        private void handleGetRequest(HttpExchange exchange) throws IOException {
-            // Read data_management.html and serve its contents
-            String response = readFile("script-no-pwd.js");
-            sendResponse(exchange, 200, "OK", response);
-        }
-        private void sendResponse(HttpExchange exchange, int statusCode, String statusMessage, String responseText) throws IOException {
-            exchange.sendResponseHeaders(statusCode, responseText.getBytes().length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(responseText.getBytes());
-            os.close();
-        }
-
-        private String readFile(String filePath) {
-            try {
-                byte[] encoded = Files.readAllBytes(Paths.get(filePath));
-                return new String(encoded);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "";
-            }
-        }
-    	
-    }
     static class statsHandler implements HttpHandler {
     	public void handle(HttpExchange exchange) throws IOException {
             String requestMethod = exchange.getRequestMethod();
@@ -185,11 +119,7 @@ public class Handlers {
         }
 
         private void resetData() {
-            String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
-            String username = "frc2024";
-            String password = "9Ng83$#8jg83gjusdwe89";
-
-            try (Connection conn = DriverManager.getConnection(url, username, password);
+            try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
                  Statement stmt = conn.createStatement()) {
 
                 // Truncate the match_data table
@@ -207,14 +137,10 @@ public class Handlers {
         }
 
         private static void backupData() {
-            String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
-            String username = "frc2024";
-            String password = "9Ng83$#8jg83gjusdwe89";
-
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
             String backupFileName = "C:\\web\\backups\\backup_" + dateFormat.format(new Date(System.currentTimeMillis())) + ".bak";
 
-            try (Connection conn = DriverManager.getConnection(url, username, password);
+            try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
                  Statement stmt = conn.createStatement()) {
 
                 // Execute the backup command
@@ -342,11 +268,7 @@ public class Handlers {
                                int notesTeleopAmp, int defenseRanking, int climbCompleted,
                                int noteTrap) {
             // Store data in the database as before
-            String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
-            String username = "frc2024";
-            String password = "9Ng83$#8jg83gjusdwe89";
-
-            try (Connection conn = DriverManager.getConnection(url, username, password);
+            try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
             	     PreparedStatement stmt = conn.prepareStatement(
             	         "INSERT INTO match_data (" +
             	         "    match_number, " +
@@ -375,8 +297,8 @@ public class Handlers {
                 stmt.setInt(10, noteTrap);
 
                 stmt.executeUpdate();
-                App.calculateAndStoreAverages();
-                App.publishMatchData();
+                AverageData.calculateAndStoreAverages();
+                MatchData.publishMatchData();
                 
             } catch (SQLException e) {
                 e.printStackTrace();
