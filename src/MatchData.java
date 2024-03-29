@@ -139,8 +139,7 @@ public class MatchData {
         htmlContent.append("</table></div>");
 
         htmlContent.append("<script src='script-no-pwd.js'></script>");
-        htmlContent.append("<center>"+Constants.VersionInfo.ver+"</center>\r\n"
-                + "</body></html>");
+        htmlContent.append("</body></html>");
 
         // Write HTML content to actual_stats.html file
         try {

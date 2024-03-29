@@ -9,8 +9,7 @@ public class Constants {
 		public static final String APIKEY = "BBajf45PGya7yhQ8pvRebwYJeMPg6vWGUJbo7u5oWMGavWlXVrJ2iFMgqy0ExwUd";
 	}
 	public static final class VersionInfo{
-		public static final String ver = "<p>FRC Scouting App - V0.2.2<br>Developed by Justin F (FRC 4728) - 2024</p>";
-		public static final String verConsole = "Server version V0.2.2 - beta";
+		public static final String verConsole = "Server version V0.2.3 - beta";
 	}
 	public static final class TBA_API{
 		public static final String TBA_EVENT = "2024mnmi2";
