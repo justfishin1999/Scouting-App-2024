@@ -20,6 +20,7 @@ public class MatchData {
             } else {
                 // Unsupported HTTP method
                 sendResponse(exchange, 405, "Method Not Allowed", "Unsupported HTTP method");
+                Utils.logMessage("405 - Method Not ALlowed - Unsupported HTTP Method");
             }
     	}
     	
@@ -41,7 +42,7 @@ public class MatchData {
                 byte[] encoded = Files.readAllBytes(Paths.get(filePath));
                 return new String(encoded);
             } catch (IOException e) {
-                e.printStackTrace();
+                Utils.logMessage(e.getMessage());
                 return "";
             }
         }
@@ -68,7 +69,6 @@ public class MatchData {
         htmlContent.append("<a href='/team_averages.html'>Team Averages</a>");
         htmlContent.append("<a href='/actual_stats.html'>Team Data</a>");
         htmlContent.append("<a href='/teams.html'>Teams</a>");
-        //htmlContent.append("<a href='https://thebluealliance.com'>The Blue Alliance</a>");
         htmlContent.append("<a href='/admin.html'>Admin</a>");
         htmlContent.append("<div class='clock' id='clock'></div>");
         htmlContent.append("</div><div class='container'>");
@@ -96,21 +96,21 @@ public class MatchData {
 
                 htmlContent.append("<tr><td>").append(matchNumber).append("</td><td>").append(teamNumber).append("</td>");
                 htmlContent.append("<td>").append(notesAutoSpeaker).append("</td><td>").append(notesAutoAmp).append("</td>");
-                htmlContent.append("<td>").append(autoMobility).append("</td><td>").append(notesTeleopSpeaker).append("</td>");
+                htmlContent.append("<td>").append(autoMobility == 1 ? "Yes" : "No").append("</td><td>").append(notesTeleopSpeaker).append("</td>");
                 htmlContent.append("<td>").append(notesTeleopAmp).append("</td><td>").append(cycleTimeTeleop).append("</td>");
-                htmlContent.append("<td>").append(climbCompleted).append("</td><td>").append(noteTrap).append("</td></tr>");
+                htmlContent.append("<td>").append(climbCompleted == 1 ? "Yes" : "No").append("</td><td>").append(noteTrap).append("</td></tr>");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+        	Utils.logMessage(e.getMessage());
         }
 
         htmlContent.append("</table></div>");
         htmlContent.append("<div class='container'>");
         htmlContent.append("<h1>Robot Data</h1>");
         htmlContent.append("<table>");
-        htmlContent.append("<tr><th>Team Number</th><th>Ground Pickup</th><th>Shoot From Podium</th>");
-        htmlContent.append("<th>Is Swerve</th><th>Can Shoot Speaker</th><th>Can Shoot Amp</th>");
-        htmlContent.append("<th>Can Shoot Trap</th><th>Can Climb</th><th>Est. Robot Speed</th></tr>");
+        htmlContent.append("<tr><th>Team Number</th><th>Ground Pickup</th><th>Podium Shot</th>");
+        htmlContent.append("<th>Swerve</th><th>Speaker</th><th>Amp</th>");
+        htmlContent.append("<th>Trap</th><th>Climb</th><th>Robot Speed</th></tr>");
 
         try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
             Statement stmt = conn.createStatement()) {
@@ -126,14 +126,14 @@ public class MatchData {
                 int canClimb = rs.getInt("can_climb");
                 int estRobotSpeed = rs.getInt("est_robot_speed");
 
-                htmlContent.append("<tr><td>").append(teamNumber).append("</td><td>").append(groundPickup).append("</td>");
-                htmlContent.append("<td>").append(shootFromPodium).append("</td><td>").append(isSwerve).append("</td>");
-                htmlContent.append("<td>").append(canShootSpeaker).append("</td><td>").append(canShootAmp).append("</td>");
-                htmlContent.append("<td>").append(canShootTrap).append("</td><td>").append(canClimb).append("</td>");
-                htmlContent.append("<td>").append(estRobotSpeed).append("</td></tr>");
+                htmlContent.append("<tr><td>").append(teamNumber).append("</td><td>").append(groundPickup == 1 ? "Yes" : "No").append("</td>");
+                htmlContent.append("<td>").append(shootFromPodium == 1 ? "Yes" : "No").append("</td><td>").append(isSwerve == 1 ? "Yes" : "No").append("</td>");
+                htmlContent.append("<td>").append(canShootSpeaker == 1 ? "Yes" : "No").append("</td><td>").append(canShootAmp == 1 ? "Yes" : "No").append("</td>");
+                htmlContent.append("<td>").append(canShootTrap == 1 ? "Yes" : "No").append("</td><td>").append(canClimb == 1 ? "Yes" : "No").append("</td>");
+                htmlContent.append("<td>").append(estRobotSpeed+" m/s").append("</td></tr>");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Utils.logMessage(e.getMessage());
         }
 
         htmlContent.append("</table></div>");
@@ -145,10 +145,9 @@ public class MatchData {
         try {
             String filePath = "C:\\web\\actual_stats.html";
             Files.writeString(Paths.get(filePath), htmlContent.toString());
-            System.out.println("Match data published to actual_stats.html");
-            System.out.println("---------------------------------");
+            Utils.logMessage("Match data published to actual_stats.html");
         } catch (IOException e) {
-            e.printStackTrace();
+        	Utils.logMessage(e.getMessage());
         }
     }
 }

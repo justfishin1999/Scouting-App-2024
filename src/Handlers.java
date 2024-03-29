@@ -43,13 +43,47 @@ public class Handlers {
                 byte[] encoded = Files.readAllBytes(Paths.get(filePath));
                 return new String(encoded);
             } catch (IOException e) {
-                e.printStackTrace();
+            	Utils.logMessage(e.getMessage());
                 return "";
             }
         }
     	
     }
-    
+    static class CSSHandler implements HttpHandler {
+    	public void handle(HttpExchange exchange) throws IOException {
+            String requestMethod = exchange.getRequestMethod();
+            if ("GET".equals(requestMethod)) {
+                handleGetRequest(exchange);
+            } else {
+                // Unsupported HTTP method
+                sendResponse(exchange, 405, "Method Not Allowed", "Unsupported HTTP method");
+            }
+    	}
+    	
+        private void handleGetRequest(HttpExchange exchange) throws IOException {
+            // Read data_management.html and serve its contents
+            String response = readFile("style.css");
+            sendResponse(exchange, 200, "OK", response);
+        }
+        
+        private void sendResponse(HttpExchange exchange, int statusCode, String statusMessage, String responseText) throws IOException {
+            exchange.sendResponseHeaders(statusCode, responseText.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(responseText.getBytes());
+            os.close();
+        }
+
+        private String readFile(String filePath) {
+            try {
+                byte[] encoded = Files.readAllBytes(Paths.get(filePath));
+                return new String(encoded);
+            } catch (IOException e) {
+            	Utils.logMessage(e.getMessage());
+                return "";
+            }
+        }
+    	
+    }
     static class DataManagementHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -82,6 +116,9 @@ public class Handlers {
             } else if ("backup".equals(action)) {
                 backupData();
                 sendResponse(exchange, 200, "OK", "Data backed up successfully!");
+            } else if ("refreshData".equals(action)){
+            	refreshData();
+            	sendResponse(exchange, 200, "OK", "Data refreshsed successfully!");
             } else {
                 sendResponse(exchange, 400, "Bad Request", "Invalid action parameter");
             }
@@ -100,11 +137,11 @@ public class Handlers {
                 // Truncate the robot_data table
                 stmt.executeUpdate("TRUNCATE TABLE robot_info");
 
-                System.out.println("Data reset successfully!");
-                System.out.println("---------------------------------");
+                Utils.logMessage("Data reset successfully!");
 
             } catch (SQLException e) {
-                e.printStackTrace();
+            	Utils.logMessage(e.getMessage());
+            	Utils.logMessage("Failed to reset data");
             }
         }
 
@@ -119,12 +156,18 @@ public class Handlers {
                 String backupCommand = "BACKUP DATABASE Scout2024 TO DISK = '" + backupFileName + "'";
                 stmt.execute(backupCommand);
 
-                System.out.println("Database backed up to: " + backupFileName);
-                System.out.println("---------------------------------");
+                Utils.logMessage("Database backed up to: " + backupFileName);
 
             } catch (SQLException e) {
-                e.printStackTrace();
+            	Utils.logMessage(e.getMessage());
+            	Utils.logMessage("Failed to backup data");
             }
+        }
+        
+        private static void refreshData() {
+        	MatchData.publishMatchData();
+        	AverageData.publishTeamAverages();
+        	Utils.logMessage("Refreshed match and average data");
         }
 
         private void sendResponse(HttpExchange exchange, int statusCode, String statusMessage, String responseText) throws IOException {
@@ -139,7 +182,7 @@ public class Handlers {
                 byte[] encoded = Files.readAllBytes(Paths.get(filePath));
                 return new String(encoded);
             } catch (IOException e) {
-                e.printStackTrace();
+            	Utils.logMessage(e.getMessage());
                 return "";
             }
         }

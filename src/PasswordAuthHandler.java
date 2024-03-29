@@ -84,7 +84,7 @@ public class PasswordAuthHandler implements HttpHandler {
             byte[] encoded = Files.readAllBytes(Paths.get(filePath));
             return new String(encoded);
         } catch (IOException e) {
-            e.printStackTrace();
+            Utils.logMessage(e.getMessage());
             return "";
         }
     }

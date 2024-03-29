@@ -107,7 +107,6 @@ public class AverageData {
         htmlContent.append("<a href='/team_averages.html'>Team Averages</a>");
         htmlContent.append("<a href='/actual_stats.html'>Team Data</a>");
         htmlContent.append("<a href='/teams.html'>Teams</a>");
-        //htmlContent.append("<a href='https://thebluealliance.com')>The Blue Alliance</a>");
         htmlContent.append("<a href='/admin.html'>Admin</a>");
         htmlContent.append("<div class='clock' id='clock'></div>");
         htmlContent.append("</div><div class='container'>");
@@ -139,7 +138,7 @@ public class AverageData {
                 htmlContent.append("<td>").append(noteTrap).append("</td></tr>");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+        	Utils.logMessage(e.getMessage());
         }
 
         htmlContent.append("</table></div>");
@@ -150,10 +149,9 @@ public class AverageData {
         try {
             String filePath = "C:\\web\\team_averages.html";
             Files.writeString(Paths.get(filePath), htmlContent.toString());
-            System.out.println("Team averages published to team_averages.html");
-            System.out.println("---------------------------------");
+            Utils.logMessage("Team averages published to team_averages.html");
         } catch (IOException e) {
-            e.printStackTrace();
+        	Utils.logMessage(e.getMessage());
         }
     }
 }

@@ -49,7 +49,7 @@ public class PitScout {
                     canShootAmp, canShootTrap, canClimb, estRobotSpeed);
 
             // Respond to the client
-            String response = "<html><body><p>Data submitted successfully!</p><a href=\"index.html\">Back to entry</a></body></html>";
+            String response = "<html><body><p>Data submitted successfully!</p><a href=\"pit-scout.html\">Back to entry</a></body></html>";
             exchange.sendResponseHeaders(200, response.getBytes().length);
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());

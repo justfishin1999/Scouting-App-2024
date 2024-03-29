@@ -2,6 +2,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Utils {
     public static String convertStreamToString(InputStream inputStream) throws IOException {
@@ -51,6 +53,10 @@ public class Utils {
         return intValue;
     }
 
-
+    public static void logMessage(String message) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yy/MM/dd_HH:mm:ss");
+        String formattedDate = dateFormat.format(new Date());
+        System.out.println(formattedDate + " - " + message);
+    }
 
 }

@@ -95,7 +95,7 @@ public class DataEntry{
                 MatchData.publishMatchData();
                 
             } catch (SQLException e) {
-                e.printStackTrace();
+                Utils.logMessage(e.getMessage());
             }
         }
 
@@ -104,7 +104,7 @@ public class DataEntry{
                 byte[] encoded = Files.readAllBytes(Paths.get(filePath));
                 return new String(encoded);
             } catch (IOException e) {
-                e.printStackTrace();
+            	Utils.logMessage(e.getMessage());
                 return "";
             }
         }

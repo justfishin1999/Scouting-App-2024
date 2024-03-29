@@ -10,7 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class TeamList {
-    static class TeamsHandler implements HttpHandler {
+    public static class TeamsHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             if ("GET".equals(exchange.getRequestMethod())) {
@@ -29,7 +29,7 @@ public class TeamList {
             }
         }
 
-        private String fetchTeamData() {
+        public static String fetchTeamData() {
             StringBuilder teamData = new StringBuilder();
             try {
                 // Blue Alliance API key
@@ -42,6 +42,7 @@ public class TeamList {
 				URL url = new URL("https://www.thebluealliance.com/api/v3/event/" + eventCode + "/teams");
 
                 // Open connection
+                Utils.logMessage("Attempting API connection to: "+url);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
                 // Set request properties
@@ -61,8 +62,9 @@ public class TeamList {
                         teamData.append(line);
                     }
                     reader.close();
+                    Utils.logMessage("Got data from TBA using API key: "+eventCode+"");
                 } else {
-                    System.out.append("Failed to retrieve data. Response code: " + responseCode);
+                    Utils.logMessage("Failed to retrieve data. Response code: " + responseCode);
                 }
 
                 // Close connection
@@ -73,7 +75,7 @@ public class TeamList {
             return teamData.toString();
         }
 
-        private void writeTeamsHtml(String teamData) {
+        public static void writeTeamsHtml(String teamData) {
             try (PrintWriter htmlContent = new PrintWriter(new FileWriter("teams.html"))) {
             	htmlContent.append("<html><head><title>Team Data</title>");
                 htmlContent.append("<style>");
@@ -94,7 +96,6 @@ public class TeamList {
                 htmlContent.append("<a href='/team_averages.html'>Team Averages</a>");
                 htmlContent.append("<a href='/actual_stats.html'>Team Data</a>");
                 htmlContent.append("<a href='/teams.html'>Teams</a>");
-                //htmlContent.append("<a href='https://thebluealliance.com'>The Blue Alliance</a>");
                 htmlContent.append("<a href='/admin.html'>Admin</a>");
                 htmlContent.append("<div class='clock' id='clock'></div>");
                 htmlContent.append("</div><div class='container'>");
@@ -120,7 +121,7 @@ public class TeamList {
                 htmlContent.append("<script src='script-no-pwd.js'></script>");
                 htmlContent.append("</body></html>");
             } catch (IOException e) {
-                e.printStackTrace();
+                Utils.logMessage(e.getMessage());
             }
         }
 
@@ -141,5 +142,10 @@ public class TeamList {
                 }
             }
         }
+    	public static void updateAPIData() {
+    		// TODO Auto-generated method stub
+    		writeTeamsHtml(fetchTeamData());
+    	}
+        
     }
 }
