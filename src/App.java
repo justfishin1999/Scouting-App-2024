@@ -23,7 +23,7 @@ public class App {
         // Print startup message
         Utils.logMessage("Starting FRC Scouting App");
         Utils.logMessage("Server is running on port 8000...");
-        Utils.logMessage(Constants.VersionInfo.verConsole);
+        Utils.logMessage(Constants.VersionInfo.verConsole1);
 
         // Calculate and store averages
         AverageData.calculateAndStoreAverages();
@@ -53,7 +53,7 @@ public class App {
         buttonPanel.add(refreshDataButton);
 
         // Create JPanel for version info
-        buttonPanel.add(new JLabel(Constants.VersionInfo.verConsole));
+        buttonPanel.add(new JLabel(Constants.VersionInfo.verConsole1));
 
         // Add action listeners to buttons
         updateMatchDataButton.addActionListener(e -> {

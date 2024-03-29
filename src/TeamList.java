@@ -92,7 +92,7 @@ public class TeamList {
                 htmlContent.append("</style></head>");
                 htmlContent.append("<body><div class='navbar'>");
                 htmlContent.append("<a href='/'>Home</a>");
-                htmlContent.append("<a href='/pit-scout.html'>Pits</a>)");
+                htmlContent.append("<a href='/pit-scout.html'>Pits</a>");
                 htmlContent.append("<a href='/team_averages.html'>Team Averages</a>");
                 htmlContent.append("<a href='/actual_stats.html'>Team Data</a>");
                 htmlContent.append("<a href='/teams.html'>Teams</a>");

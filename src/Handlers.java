@@ -136,6 +136,9 @@ public class Handlers {
                 
                 // Truncate the robot_data table
                 stmt.executeUpdate("TRUNCATE TABLE robot_info");
+                
+                AverageData.calculateAndStoreAverages();
+                MatchData.publishMatchData();
 
                 Utils.logMessage("Data reset successfully!");
 
