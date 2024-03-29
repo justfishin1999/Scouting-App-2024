@@ -15,13 +15,14 @@ public class App {
         server.createContext("/script-no-pwd.js", new JSHandler.javascriptHandler2());
         server.createContext("/admin.html", new PasswordAuthHandler());
         server.createContext("/teams.html",new TeamList.TeamsHandler());
+        server.createContext("/pit-scout.html",new PitScout.DataEntryHandler());
         server.start();
         
         System.out.println("**********************************");
         System.out.println("Starting FRC Scouting App");
         System.out.println("**********************************");
         System.out.println("Server is running on port 8000...");
-        System.out.println("Server version v0.1.5 - beta");
+        System.out.println(Constants.VersionInfo.verConsole);
         System.out.println("**********************************");
 
         // Calculate and store averages

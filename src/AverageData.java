@@ -103,10 +103,11 @@ public class AverageData {
         htmlContent.append("</style></head>");
         htmlContent.append("<body><div class='navbar'>");
         htmlContent.append("<a href='/'>Home</a>");
+        htmlContent.append("<a href='/pit-scout.html'>Pits</a>)");
         htmlContent.append("<a href='/team_averages.html'>Team Averages</a>");
         htmlContent.append("<a href='/actual_stats.html'>Team Data</a>");
         htmlContent.append("<a href='/teams.html'>Teams</a>");
-        htmlContent.append("<a href='https://thebluealliance.com')>The Blue Alliance</a>");
+        //htmlContent.append("<a href='https://thebluealliance.com')>The Blue Alliance</a>");
         htmlContent.append("<a href='/admin.html'>Admin</a>");
         htmlContent.append("<div class='clock' id='clock'></div>");
         htmlContent.append("</div><div class='container'>");
@@ -143,8 +144,8 @@ public class AverageData {
 
         htmlContent.append("</table></div>");
         htmlContent.append("<script src='script-no-pwd.js'></script>");
-        htmlContent.append("<center><p>FRC Scouting App - V0.1.5<br>Developed by Justin F (FRC 4728) - 2024</p></center>\r\n"
-        		+ "</body></html>");
+        htmlContent.append("<center>"+Constants.VersionInfo.ver+"</center>\r\n"
+                + "</body></html>");
 
         // Write HTML content to team_averages.html file
         try {

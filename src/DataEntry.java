@@ -34,16 +34,16 @@ public class DataEntry{
             // Process form data as before
             String query = new String(exchange.getRequestBody().readAllBytes());
             String[] params = query.split("&");
-            int matchNumber = parseOrDefault(params[0].split("=")[1], 0);
-            int teamNumber = parseOrDefault(params[1].split("=")[1], 0);
-            int notesAutoSpeaker = parseOrDefault(params[2].split("=")[1], 0);
-            int notesAutoAmp = parseOrDefault(params[3].split("=")[1], 0);
-            int autoMobility = parseOrDefault(params[4].split("=")[1], 0);
-            int notesTeleopSpeaker = parseOrDefault(params[5].split("=")[1], 0);
-            int notesTeleopAmp = parseOrDefault(params[6].split("=")[1], 0);
-            int defenseRanking = parseOrDefault(params[7].split("=")[1], 0);
-            int climbCompleted = parseOrDefault(params[8].split("=")[1], 0);
-            int noteTrap = parseOrDefault(params[9].split("=")[1], 0);
+            int matchNumber = Utils.parseOrDefault(params[0].split("=")[1], 0);
+            int teamNumber = Utils.parseOrDefault(params[1].split("=")[1], 0);
+            int notesAutoSpeaker = Utils.parseOrDefault(params[2].split("=")[1], 0);
+            int notesAutoAmp = Utils.parseOrDefault(params[3].split("=")[1], 0);
+            int autoMobility = Utils.parseOrDefault(params[4].split("=")[1], 0);
+            int notesTeleopSpeaker = Utils.parseOrDefault(params[5].split("=")[1], 0);
+            int notesTeleopAmp = Utils.parseOrDefault(params[6].split("=")[1], 0);
+            int defenseRanking = Utils.parseOrDefault(params[7].split("=")[1], 0);
+            int climbCompleted = Utils.parseOrDefault(params[8].split("=")[1], 0);
+            int noteTrap = Utils.parseOrDefault(params[9].split("=")[1], 0);
 
             // Store data in the database
             storeData(matchNumber, teamNumber, notesAutoSpeaker, notesAutoAmp, autoMobility,
@@ -57,12 +57,7 @@ public class DataEntry{
             os.close();
         }
         
-        private int parseOrDefault(String value, int defaultValue) {
-            if (value == null || value.isEmpty()) {
-                return defaultValue;
-            }
-            return Integer.parseInt(value);
-        }
+
         
         private void storeData(int matchNumber, int teamNumber, int notesAutoSpeaker,
                                int notesAutoAmp, int autoMobility, int notesTeleopSpeaker,

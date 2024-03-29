@@ -64,10 +64,11 @@ public class MatchData {
         htmlContent.append("</style></head>");
         htmlContent.append("<body><div class='navbar'>");
         htmlContent.append("<a href='/'>Home</a>");
+        htmlContent.append("<a href='/pit-scout.html'>Pits</a>)");
         htmlContent.append("<a href='/team_averages.html'>Team Averages</a>");
         htmlContent.append("<a href='/actual_stats.html'>Team Data</a>");
         htmlContent.append("<a href='/teams.html'>Teams</a>");
-        htmlContent.append("<a href='https://thebluealliance.com'>The Blue Alliance</a>");
+        //htmlContent.append("<a href='https://thebluealliance.com'>The Blue Alliance</a>");
         htmlContent.append("<a href='/admin.html'>Admin</a>");
         htmlContent.append("<div class='clock' id='clock'></div>");
         htmlContent.append("</div><div class='container'>");
@@ -104,8 +105,41 @@ public class MatchData {
         }
 
         htmlContent.append("</table></div>");
+        htmlContent.append("<div class='container'>");
+        htmlContent.append("<h1>Robot Data</h1>");
+        htmlContent.append("<table>");
+        htmlContent.append("<tr><th>Team Number</th><th>Ground Pickup</th><th>Shoot From Podium</th>");
+        htmlContent.append("<th>Is Swerve</th><th>Can Shoot Speaker</th><th>Can Shoot Amp</th>");
+        htmlContent.append("<th>Can Shoot Trap</th><th>Can Climb</th><th>Est. Robot Speed</th></tr>");
+
+        try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
+            Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery("SELECT * FROM robot_info");
+            while (rs.next()) {
+                int teamNumber = rs.getInt("team_number");
+                int groundPickup = rs.getInt("ground_pickup");
+                int shootFromPodium = rs.getInt("shoot_from_podium");
+                int isSwerve = rs.getInt("is_swerve");
+                int canShootSpeaker = rs.getInt("can_shoot_speaker");
+                int canShootAmp = rs.getInt("can_shoot_amp");
+                int canShootTrap = rs.getInt("can_shoot_trap");
+                int canClimb = rs.getInt("can_climb");
+                int estRobotSpeed = rs.getInt("est_robot_speed");
+
+                htmlContent.append("<tr><td>").append(teamNumber).append("</td><td>").append(groundPickup).append("</td>");
+                htmlContent.append("<td>").append(shootFromPodium).append("</td><td>").append(isSwerve).append("</td>");
+                htmlContent.append("<td>").append(canShootSpeaker).append("</td><td>").append(canShootAmp).append("</td>");
+                htmlContent.append("<td>").append(canShootTrap).append("</td><td>").append(canClimb).append("</td>");
+                htmlContent.append("<td>").append(estRobotSpeed).append("</td></tr>");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        htmlContent.append("</table></div>");
+
         htmlContent.append("<script src='script-no-pwd.js'></script>");
-        htmlContent.append("<center><p>FRC Scouting App - V0.1.3<br>Developed by Justin F (FRC 4728) - 2024</p></center>\r\n"
+        htmlContent.append("<center>"+Constants.VersionInfo.ver+"</center>\r\n"
                 + "</body></html>");
 
         // Write HTML content to actual_stats.html file

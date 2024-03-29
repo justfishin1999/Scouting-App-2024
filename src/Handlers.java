@@ -96,6 +96,9 @@ public class Handlers {
 
                 // Truncate the match_avg table
                 stmt.executeUpdate("TRUNCATE TABLE match_avg");
+                
+                // Truncate the robot_data table
+                stmt.executeUpdate("TRUNCATE TABLE robot_info");
 
                 System.out.println("Data reset successfully!");
                 System.out.println("---------------------------------");
