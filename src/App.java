@@ -21,12 +21,9 @@ public class App {
         }).start();
 
         // Print startup message
-        System.out.println("**********************************");
-        System.out.println("Starting FRC Scouting App");
-        System.out.println("**********************************");
-        System.out.println("Server is running on port 8000...");
-        System.out.println(Constants.VersionInfo.verConsole);
-        System.out.println("**********************************");
+        Utils.logMessage("Starting FRC Scouting App");
+        Utils.logMessage("Server is running on port 8000...");
+        Utils.logMessage(Constants.VersionInfo.verConsole);
 
         // Calculate and store averages
         AverageData.calculateAndStoreAverages();

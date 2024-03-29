@@ -9,7 +9,7 @@ public class Constants {
 		public static final String APIKEY = "BBajf45PGya7yhQ8pvRebwYJeMPg6vWGUJbo7u5oWMGavWlXVrJ2iFMgqy0ExwUd";
 	}
 	public static final class VersionInfo{
-		public static final String verConsole = "Server Version: V0.3.9 - beta";
+		public static final String verConsole = "Server Version: V1.0.1 - prod";
 	}
 	public static final class TBA_API{
 		public static final String TBA_EVENT = "2024mnmi2";
