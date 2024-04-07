@@ -95,6 +95,7 @@ public class TeamList {
                 htmlContent.append("<a href='/pit-scout.html'>Pits</a>");
                 htmlContent.append("<a href='/team_averages.html'>Team Averages</a>");
                 htmlContent.append("<a href='/actual_stats.html'>Team Data</a>");
+                htmlContent.append("<a href='/reports.html'>Reports</a>");
                 htmlContent.append("<a href='/teams.html'>Teams</a>");
                 htmlContent.append("<a href='/admin.html'>Admin</a>");
                 htmlContent.append("<div class='clock' id='clock'></div>");
