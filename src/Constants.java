@@ -6,10 +6,11 @@ public class Constants {
 	}
 	public static final class PasswordConstants{
 		public static final String PASSWORD = "R0b0t1cs2k24#";
+		public static final String PASSWORD_ADMIN = "F77yHreZpr$c3W";
 		public static final String APIKEY = "BBajf45PGya7yhQ8pvRebwYJeMPg6vWGUJbo7u5oWMGavWlXVrJ2iFMgqy0ExwUd";
 	}
 	public static final class VersionInfo{
-		public static final String verConsole = "Server Version: V1.1.3 - UAT";
+		public static final String verConsole1 = "Server Version: V1.2.2 - PROD";
 	}
 	public static final class TBA_API{
 		public static final String TBA_EVENT = "2024mnmi2";
