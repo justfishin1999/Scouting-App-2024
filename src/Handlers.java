@@ -112,15 +112,15 @@ public class Handlers {
 
             if ("reset".equals(action)) {
                 resetData();
-                sendResponse(exchange, 200, "OK", "Data reset successfully!");
+                sendPromptResponse(exchange, 200, "OK", "Data reset successfully!");
             } else if ("backup".equals(action)) {
                 backupData();
-                sendResponse(exchange, 200, "OK", "Data backed up successfully!");
+                sendPromptResponse(exchange, 200, "OK", "Data backed up successfully!");
             } else if ("refreshData".equals(action)){
             	refreshData();
-            	sendResponse(exchange, 200, "OK", "Data refreshsed successfully!");
+            	sendPromptResponse(exchange, 200, "OK", "Data refreshsed successfully!");
             } else {
-                sendResponse(exchange, 400, "Bad Request", "Invalid action parameter");
+            	sendPromptResponse(exchange, 400, "Bad Request", "Invalid action parameter");
             }
         }
 
@@ -179,6 +179,16 @@ public class Handlers {
             os.write(responseText.getBytes());
             os.close();
         }
+        
+		private void sendPromptResponse(HttpExchange exchange, int statusCode, String statusMessage,String responseText) throws IOException {
+			//send a javascript response to the user containing the response text
+            String jsResponse = "<script>alert('"+responseText+"'); window.location.href = 'data_management.html?source=uo78t6irtdyugiuo6itdycygioftdiyrckgvlyfuotdiyrxfjc';</script>";
+            exchange.getResponseHeaders().set("Content-Type", "text/html");
+            exchange.sendResponseHeaders(200, jsResponse.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(jsResponse.getBytes());
+            os.close();
+		}
 
         private String readFile(String filePath) {
             try {

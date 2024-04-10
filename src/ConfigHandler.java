@@ -5,7 +5,6 @@ import java.io.IOException;
 
 public class ConfigHandler {
 	static String fileName = "config.txt";
-	public static String form1Value,form2Value,form3Value,form4Value,form5Value,form6Value,form7Value,form8Value = null;
 	FileReader fileReader;
 	
 	public static void readConfigFile() throws FileNotFoundException, IOException {
@@ -16,30 +15,38 @@ public class ConfigHandler {
 				if(parts.length==2) {
 					String key = parts[0].trim();
 					String value = parts[1].replaceAll("\"", "").trim();
-					
-					if(key.equals("form1")) {
-						form1Value = value;
+					if(key.equals("serverVersion")) {
+						Constants.VersionInfo.verConsole1 = "Server Version: "+value;
+						Utils.logMessage("Server Version: "+value);
 					}
-					if(key.equals("form2")) {
-						form2Value = value;
+					if(key.equals("eventkey")) {
+						Constants.TBA_API.TBA_EVENT = value;
+						Utils.logMessage("Event Key: "+value);
 					}
-					if(key.equals("form3")) {
-						form3Value = value;
+					if (key.equals("adminPwd")) {
+						Constants.PasswordConstants.PASSWORD_ADMIN = value;
 					}
-					if(key.equals("form4")) {
-						form4Value = value;
+					if (key.equals("apiKey")) {
+						Constants.PasswordConstants.APIKEY = value;
+						Utils.logMessage("API Key: " + value);
 					}
-					if(key.equals("form5")) {
-						form5Value = value;
+					if (key.equals("webPwd")) {
+						Constants.PasswordConstants.PASSWORD = value;
 					}
-					if(key.equals("form6")) {
-						form6Value = value;
+					if (key.equals("serverIP")) {
+						Constants.JDBCConstants.serverIP = value;
 					}
-					if(key.equals("form7")) {
-						form7Value = value;
+					if (key.equals("sqlPort")) {
+						Constants.JDBCConstants.sqlPort = value;
 					}
-					if(key.equals("form8")) {
-						form8Value = value;
+					if (key.equals("dbName")) {
+						Constants.JDBCConstants.dbName = value;
+					}
+					if (key.equals("sqlUsr")) {
+						Constants.JDBCConstants.username = value;
+					}
+					if (key.equals("sqlPwd")) {
+						Constants.JDBCConstants.password = value;
 					}
 				}
 			}

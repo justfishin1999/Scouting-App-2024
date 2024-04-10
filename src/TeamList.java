@@ -78,18 +78,7 @@ public class TeamList {
         public static void writeTeamsHtml(String teamData) {
             try (PrintWriter htmlContent = new PrintWriter(new FileWriter("teams.html"))) {
             	htmlContent.append("<html><head><title>Team Data</title>");
-                htmlContent.append("<style>");
-                htmlContent.append("body {font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 0;}");
-                htmlContent.append(".navbar {overflow: hidden; background-color: #333;}");
-                htmlContent.append(".navbar a {float: left; display: block; color: #f2f2f2; text-align: center; padding: 14px 20px; text-decoration: none;}");
-                htmlContent.append(".navbar a:hover {background-color: #ddd; color: black;}");
-                htmlContent.append(".navbar .clock {float: right; color: #f2f2f2; padding: 14px 20px;}");
-                htmlContent.append(".container {width: 800px; margin: 20px auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);}");
-                htmlContent.append("h1 {text-align: center; margin-bottom: 20px;}");
-                htmlContent.append("table {width: 100%; border-collapse: collapse;}");
-                htmlContent.append("th, td {padding: 8px; text-align: left; border-bottom: 1px solid #ddd;}");
-                htmlContent.append("tr:nth-child(even) {background-color: #f2f2f2;}");
-                htmlContent.append("</style></head>");
+            	htmlContent.append("<link rel=\"stylesheet\" href=\"style.css\">");
                 htmlContent.append("<body><div class='navbar'>");
                 htmlContent.append("<a href='/'>Home</a>");
                 htmlContent.append("<a href='/pit-scout.html'>Pits</a>");
@@ -102,7 +91,7 @@ public class TeamList {
                 htmlContent.append("</div><div class='container'>");
                 htmlContent.append("<h1>Team List</h1>");
                 htmlContent.append("<center><p>Showing info from <i><a href='https://thebluealliance.com'>The Blue Alliance</a></i> for event ID: "+ Constants.TBA_API.TBA_EVENT +"</p></center>");
-                htmlContent.append("<table>");
+                htmlContent.append("<table class='table-test'>");
                 htmlContent.append("<tr><th>Team Number</th><th>Team Name</th><th>Location</th><th>Country</th></tr>");
 
                 // Parse JSON response

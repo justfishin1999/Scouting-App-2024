@@ -1,18 +1,20 @@
 public class Constants {
 	public static final class JDBCConstants{
-	    public static final String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
-	    public static final String username = "frc2024";
-	    public static final String password = "9Ng83$#8jg83gjusdwe89";
+		public static String serverIP,sqlPort,dbName,encrypt;
+	    public static String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
+	    public static String url2 = "jdbc:sqlserver://"+serverIP +":"+sqlPort +";databaseName="+dbName +";encrypt=false";
+	    public static String username;
+	    public static String password;
 	}
 	public static final class PasswordConstants{
-		public static final String PASSWORD = "R0b0t1cs2k24#";
-		public static final String PASSWORD_ADMIN = "F77yHreZpr$c3W";
-		public static final String APIKEY = "BBajf45PGya7yhQ8pvRebwYJeMPg6vWGUJbo7u5oWMGavWlXVrJ2iFMgqy0ExwUd";
+		public static String PASSWORD;
+		public static String PASSWORD_ADMIN;
+		public static String APIKEY;
 	}
 	public static final class VersionInfo{
-		public static final String verConsole1 = "Server Version: V1.2.2 - PROD";
+		public static String verConsole1;
 	}
 	public static final class TBA_API{
-		public static final String TBA_EVENT = "2024mnmi2";
+		public static String TBA_EVENT;
 	}
 }

@@ -58,5 +58,21 @@ public class Utils {
         String formattedDate = dateFormat.format(new Date());
         System.out.println(formattedDate + " - " + message);
     }
+    class Response {
+        public String message;
+
+        public Response(String message) {
+            this.message = message;
+        }
+
+        // Getter and setter for the message field
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+    }
 
 }

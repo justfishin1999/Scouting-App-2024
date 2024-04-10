@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -49,11 +50,28 @@ public class PitScout {
                     canShootAmp, canShootTrap, canClimb, estRobotSpeed);
 
             // Respond to the client
-            String response = "<html><body><p>Data submitted successfully!</p><a href=\"pit-scout.html\">Back to entry</a></body></html>";
-            exchange.sendResponseHeaders(200, response.getBytes().length);
+            String jsResponse = "<script>alert('Data submitted successfully!'); window.location.href = 'pit-scout.html';</script>";
+            exchange.getResponseHeaders().set("Content-Type", "text/html");
+            exchange.sendResponseHeaders(200, jsResponse.getBytes().length);
             OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
+            os.write(jsResponse.getBytes());
             os.close();
+        }
+        class Response {
+            public String message;
+
+            public Response(String message) {
+                this.message = message;
+            }
+
+            // Getter and setter for the message field
+            public String getMessage() {
+                return message;
+            }
+
+            public void setMessage(String message) {
+                this.message = message;
+            }
         }
 
         private void storeData(int teamNumber, int groundPickup, int shootFromPodium,

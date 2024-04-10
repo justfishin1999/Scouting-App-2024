@@ -6,6 +6,8 @@ import com.sun.net.httpserver.*;
 
 public class App {
     public static void main(String[] args) throws IOException {
+    	ConfigHandler.readConfigFile();
+    	
         // Start Swing GUI
         SwingUtilities.invokeLater(() -> {
             createAndShowGUI();
@@ -28,6 +30,8 @@ public class App {
         // Calculate and store averages
         AverageData.calculateAndStoreAverages();
         MatchData.publishMatchData();
+        Utils.logMessage("SQL String:"+Constants.JDBCConstants.url);
+        Utils.logMessage("SQL String Test: "+Constants.JDBCConstants.url2);
     }
     
     private static void createAndShowGUI() {
