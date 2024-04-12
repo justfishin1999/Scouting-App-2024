@@ -60,6 +60,7 @@ public class MatchData {
         htmlContent.append("<a class='active' href='/actual_stats.html'>Team Data</a>");
         htmlContent.append("<a href='/reports.html'>Reports</a>");
         htmlContent.append("<a href='/teams.html'>Teams</a>");
+        htmlContent.append("<a href='/stats_query.html'>Stats Query</a>");
         htmlContent.append("<a href='/admin.html'>Admin</a>");
         htmlContent.append("<div class='clock' id='clock'></div>");
         htmlContent.append("</div><div class='container'>");
@@ -70,7 +71,7 @@ public class MatchData {
         htmlContent.append("<th>Notes Teleop Amp</th><th>Defensive Ranking</th><th>Climb Completed</th>");
         htmlContent.append("<th>Note Trap</th></tr>");
 
-        try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
+        try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.USERNAME, Constants.JDBCConstants.PASSWORD);
             Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery("SELECT * FROM match_data");
             while (rs.next()) {
@@ -103,7 +104,7 @@ public class MatchData {
         htmlContent.append("<th>Swerve</th><th>Speaker</th><th>Amp</th>");
         htmlContent.append("<th>Trap</th><th>Climb</th><th>Robot Speed</th></tr>");
 
-        try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
+        try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.USERNAME, Constants.JDBCConstants.PASSWORD);
             Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery("SELECT * FROM robot_info");
             while (rs.next()) {

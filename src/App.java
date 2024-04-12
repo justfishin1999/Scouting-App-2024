@@ -22,16 +22,17 @@ public class App {
             }
         }).start();
 
-        // Print startup message
-        Utils.logMessage("Starting FRC Scouting App");
-        Utils.logMessage("Server is running on port 8000...");
-        Utils.logMessage(Constants.VersionInfo.verConsole1);
-
         // Calculate and store averages
         AverageData.calculateAndStoreAverages();
         MatchData.publishMatchData();
-        Utils.logMessage("SQL String:"+Constants.JDBCConstants.url);
-        Utils.logMessage("SQL String Test: "+Constants.JDBCConstants.url2);
+        Utils.logMessage("SQL String: "+Constants.JDBCConstants.url);
+        Utils.logMessage("SQL String Test: "+Constants.JDBCConstants.URL2);
+        Utils.logMessage("SQL Server IP: "+Constants.JDBCConstants.SERVER_IP);
+        Utils.logMessage("SQL Server Port: "+Constants.JDBCConstants.SQL_PORT);
+        Utils.logMessage("SQL Database Name: "+Constants.JDBCConstants.DB_NAME);
+        Utils.logMessage("Server Version: "+Constants.VersionInfo.verConsole1);
+        Utils.logMessage("Event Key: "+Constants.TBA_API.TBA_EVENT);
+        Utils.logMessage("API Key: "+Constants.PasswordConstants.APIKEY);
     }
     
     private static void createAndShowGUI() {
@@ -107,6 +108,8 @@ public class App {
         server.createContext("/style.css",new Handlers.CSSHandler());
         server.createContext("/TeamInfoServlet", new TeamInfoServlet.TeamInfoHandler());
         server.createContext("/reports.html", new TeamInfoServlet.ReportsPageHandler());
+        server.createContext("/teams", new StatsQuery.TeamsHandler());
+        server.createContext("/stats_query.html", new StatsQuery.StatsQueryHttp());
         server.start();
     }
     

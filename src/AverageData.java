@@ -49,7 +49,7 @@ public class AverageData {
         }
     }
     public static void calculateAndStoreAverages() {
-        try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
+        try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.USERNAME, Constants.JDBCConstants.PASSWORD);
              Statement stmt = conn.createStatement()) {
 
             // List of columns to calculate averages for
@@ -98,6 +98,7 @@ public class AverageData {
         htmlContent.append("<a href='/actual_stats.html'>Team Data</a>");
         htmlContent.append("<a href='/reports.html'>Reports</a>");
         htmlContent.append("<a href='/teams.html'>Teams</a>");
+        htmlContent.append("<a href='/stats_query.html'>Stats Query</a>");
         htmlContent.append("<a href='/admin.html'>Admin</a>");
         htmlContent.append("<div class='clock' id='clock'></div>");
         htmlContent.append("</div><div class='container'>");
@@ -107,7 +108,7 @@ public class AverageData {
         htmlContent.append("<th>Auto Mobility</th><th>Notes Teleop Speaker</th><th>Notes Teleop Amp</th>");
         htmlContent.append("<th>Defensive Ranking</th><th>Climb Completed</th><th>Notes Trap</th></tr>");
 
-        try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
+        try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.USERNAME, Constants.JDBCConstants.PASSWORD);
              Statement stmt = conn.createStatement()) {
 
             ResultSet rs = stmt.executeQuery("SELECT * FROM match_avg");

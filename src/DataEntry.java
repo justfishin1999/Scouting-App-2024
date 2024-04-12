@@ -83,7 +83,7 @@ public class DataEntry{
                                int notesTeleopAmp, int defenseRanking, int climbCompleted,
                                int noteTrap) {
             // Store data in the database as before
-            try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
+            try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.USERNAME, Constants.JDBCConstants.PASSWORD);
             	     PreparedStatement stmt = conn.prepareStatement(
             	         "INSERT INTO match_data (" +
             	         "    match_number, " +

@@ -85,7 +85,8 @@ public class TeamList {
                 htmlContent.append("<a href='/team_averages.html'>Team Averages</a>");
                 htmlContent.append("<a href='/actual_stats.html'>Team Data</a>");
                 htmlContent.append("<a href='/reports.html'>Reports</a>");
-                htmlContent.append("<a href='/teams.html'>Teams</a>");
+                htmlContent.append("<a class='active' href='/teams.html'>Teams</a>");
+                htmlContent.append("<a href='/stats_query.html'>Stats Query</a>");
                 htmlContent.append("<a href='/admin.html'>Admin</a>");
                 htmlContent.append("<div class='clock' id='clock'></div>");
                 htmlContent.append("</div><div class='container'>");

@@ -1,10 +1,10 @@
 public class Constants {
 	public static final class JDBCConstants{
-		public static String serverIP,sqlPort,dbName,encrypt;
+		public static String SERVER_IP,SQL_PORT,DB_NAME;
 	    public static String url = "jdbc:sqlserver://localhost:1433;databaseName=Scout2024;encrypt=false";
-	    public static String url2 = "jdbc:sqlserver://"+serverIP +":"+sqlPort +";databaseName="+dbName +";encrypt=false";
-	    public static String username;
-	    public static String password;
+	    public static String URL2 = "jdbc:sqlserver://"+SERVER_IP +":"+SQL_PORT +";databaseName="+DB_NAME +";encrypt=false";
+	    public static String USERNAME;
+	    public static String PASSWORD;
 	}
 	public static final class PasswordConstants{
 		public static String PASSWORD;

@@ -38,7 +38,7 @@ public class TeamInfoServlet {
         private String processRequest(String teamNumber) {
             StringBuilder teamInfo = new StringBuilder();
             try {
-                Connection con = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
+                Connection con = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.USERNAME, Constants.JDBCConstants.PASSWORD);
 
                 // Query match_data
                 String queryMatchData = "SELECT * FROM match_data WHERE team_number = ?";

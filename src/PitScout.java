@@ -79,7 +79,7 @@ public class PitScout {
                                int canShootTrap, int canClimb, int estRobotSpeed) {
             // Store data in the database
             try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url,
-                    Constants.JDBCConstants.username, Constants.JDBCConstants.password);
+                    Constants.JDBCConstants.USERNAME, Constants.JDBCConstants.PASSWORD);
                  PreparedStatement stmt = conn.prepareStatement(
                          "INSERT INTO robot_info (" +
                                  "    team_number, " +

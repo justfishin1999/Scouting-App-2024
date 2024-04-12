@@ -125,7 +125,7 @@ public class Handlers {
         }
 
         private void resetData() {
-            try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
+            try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.USERNAME, Constants.JDBCConstants.PASSWORD);
                  Statement stmt = conn.createStatement()) {
 
                 // Truncate the match_data table
@@ -152,7 +152,7 @@ public class Handlers {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
             String backupFileName = "C:\\web\\backups\\backup_" + dateFormat.format(new Date(System.currentTimeMillis())) + ".bak";
 
-            try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.username, Constants.JDBCConstants.password);
+            try (Connection conn = DriverManager.getConnection(Constants.JDBCConstants.url, Constants.JDBCConstants.USERNAME, Constants.JDBCConstants.PASSWORD);
                  Statement stmt = conn.createStatement()) {
 
                 // Execute the backup command

@@ -16,7 +16,7 @@ public class ConfigHandler {
 					String key = parts[0].trim();
 					String value = parts[1].replaceAll("\"", "").trim();
 					if(key.equals("serverVersion")) {
-						Constants.VersionInfo.verConsole1 = "Server Version: "+value;
+						Constants.VersionInfo.verConsole1 = value;
 						Utils.logMessage("Server Version: "+value);
 					}
 					if(key.equals("eventkey")) {
@@ -34,19 +34,19 @@ public class ConfigHandler {
 						Constants.PasswordConstants.PASSWORD = value;
 					}
 					if (key.equals("serverIP")) {
-						Constants.JDBCConstants.serverIP = value;
+						Constants.JDBCConstants.SERVER_IP = value;
 					}
 					if (key.equals("sqlPort")) {
-						Constants.JDBCConstants.sqlPort = value;
+						Constants.JDBCConstants.SQL_PORT = value;
 					}
 					if (key.equals("dbName")) {
-						Constants.JDBCConstants.dbName = value;
+						Constants.JDBCConstants.DB_NAME = value;
 					}
 					if (key.equals("sqlUsr")) {
-						Constants.JDBCConstants.username = value;
+						Constants.JDBCConstants.USERNAME = value;
 					}
 					if (key.equals("sqlPwd")) {
-						Constants.JDBCConstants.password = value;
+						Constants.JDBCConstants.PASSWORD = value;
 					}
 				}
 			}

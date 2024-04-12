@@ -16,18 +16,6 @@ public class Utils {
         }
         return result.toString();
     }
-    /*public static int parseOrDefault(String value, int defaultValue) {
-        if (value == null || value.isEmpty()) {
-            return defaultValue;
-        }
-        // Check if the value contains a decimal point
-        int decimalIndex = value.indexOf('.');
-        if (decimalIndex != -1) {
-            // Remove everything after the decimal point and parse the integer
-            value = value.substring(0, decimalIndex);
-        }
-        return Integer.parseInt(value);
-    }*/
     public static int parseOrDefault(String value, int defaultValue) {
         if (value == null || value.isEmpty()) {
             return defaultValue;
@@ -57,22 +45,6 @@ public class Utils {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yy/MM/dd_HH:mm:ss");
         String formattedDate = dateFormat.format(new Date());
         System.out.println(formattedDate + " - " + message);
-    }
-    class Response {
-        public String message;
-
-        public Response(String message) {
-            this.message = message;
-        }
-
-        // Getter and setter for the message field
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
     }
 
 }
