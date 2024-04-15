@@ -16,5 +16,6 @@ public class Constants {
 	}
 	public static final class TBA_API{
 		public static String TBA_EVENT;
+		public static String STAT_TEAM;
 	}
 }

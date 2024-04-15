@@ -48,6 +48,9 @@ public class ConfigHandler {
 					if (key.equals("sqlPwd")) {
 						Constants.JDBCConstants.PASSWORD = value;
 					}
+					if (key.equals("statsTeam")) {
+						Constants.TBA_API.STAT_TEAM = value;
+					}
 				}
 			}
 		} catch (IOException e) {

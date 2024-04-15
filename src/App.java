@@ -25,7 +25,7 @@ public class App {
         // Calculate and store averages
         AverageData.calculateAndStoreAverages();
         MatchData.publishMatchData();
-        StatsQuery.TeamsHandler.generateHtmlPage(StatsQuery.TeamsHandler.fetchTeamMatchData(Constants.TBA_API.TBA_EVENT));
+        StatsQuery.StatsHandler.writeMatchesHtml(StatsQuery.StatsHandler.fetchMatchData());
         Utils.logMessage("SQL String: "+Constants.JDBCConstants.url);
         Utils.logMessage("SQL String Test: "+Constants.JDBCConstants.URL2);
         Utils.logMessage("SQL Server IP: "+Constants.JDBCConstants.SERVER_IP);
@@ -107,8 +107,7 @@ public class App {
         server.createContext("/style.css", new Handlers.CSSHandler());
         server.createContext("/TeamInfoServlet", new TeamInfoServlet.TeamInfoHandler());
         server.createContext("/reports.html", new TeamInfoServlet.ReportsPageHandler());
-        server.createContext("/teams", new StatsQuery.TeamsHandler());
-        server.createContext("/stats_query.html", new StatsQuery.StatsQueryHttp());
+        server.createContext("/stats_query.html",new StatsQuery.StatsHandler());
         server.start();
     }
 

@@ -2,29 +2,28 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Scanner;
+import java.util.Map.Entry;
 
 public class StatsQuery {
-    public static class TeamsHandler implements HttpHandler {
+    public static class StatsHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             if ("GET".equals(exchange.getRequestMethod())) {
-                String eventCode = Constants.TBA_API.TBA_EVENT;
-                String teamMatchData = fetchTeamMatchData(eventCode);
-                String htmlContent = generateHtmlPage(teamMatchData);
-                sendResponse(exchange, htmlContent);
+                // Call the API to fetch match data
+                String matchData = fetchMatchData();
+
+                // Write the match data to matches.html
+                writeMatchesHtml(matchData);
+
+                // Send matches.html to the client
+                sendMatchesHtmlToClient(exchange);
             } else {
                 // Unsupported HTTP method
                 exchange.sendResponseHeaders(405, 0);
@@ -32,146 +31,142 @@ public class StatsQuery {
             }
         }
 
-        public static String fetchTeamMatchData(String eventCode) throws IOException {
-            StringBuilder teamMatchData = new StringBuilder();
-            String apiUrl = "https://api.statbotics.io/v2/team_matches/event/" + eventCode;
-            URL url = new URL(apiUrl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
+        public static String fetchMatchData() {
+            StringBuilder matchData = new StringBuilder();
+            try {
+                // Statbotics.io API key
+                String apiKey = Constants.PasswordConstants.APIKEY;
+                // Event key for the event you want to fetch matches for
+                String eventKey = Constants.TBA_API.TBA_EVENT;
 
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                Scanner scanner = new Scanner(connection.getInputStream());
-                while (scanner.hasNextLine()) {
-                    teamMatchData.append(scanner.nextLine());
+                // Create URL object
+                URL url = new URL("https://api.statbotics.io/v2/matches/event/"+Constants.TBA_API.TBA_EVENT);
+
+                // Open connection
+                Utils.logMessage("Attempting API connection to: " + url);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+                // Set request properties
+                connection.setRequestMethod("GET");
+                //connection.setRequestProperty("Authorization", "Bearer " + apiKey);
+                connection.setRequestProperty("User-Agent", "Java-App-1.0");
+
+                // Get response code
+                int responseCode = connection.getResponseCode();
+
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    // Read response
+                    BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(connection.getInputStream()));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        matchData.append(line);
+                    }
+                    reader.close();
+                    Utils.logMessage("Got data from Statbotics.io using API key: " + eventKey);
+                } else {
+                    Utils.logMessage("Failed to retrieve data. Response code: " + responseCode);
                 }
-                scanner.close();
-            } else {
-                System.err.println("Failed to retrieve data. Response code: " + responseCode);
-            }
-            connection.disconnect();
-            return teamMatchData.toString();
-        }
 
-        public static String generateHtmlPage(String teamMatchData) {
-            StringBuilder htmlContent = new StringBuilder();
-            htmlContent.append("<html><head><title>Team Matches</title>");
-            htmlContent.append("<link rel=\"stylesheet\" href=\"style.css\">");
-            htmlContent.append("</head><body>");
-            htmlContent.append("<div class='navbar'>");
-            htmlContent.append("<a href='/'>Home</a>");
-            htmlContent.append("<a href='/pit-scout.html'>Pits</a>");
-            htmlContent.append("<a href='/team_averages.html'>Team Averages</a>");
-            htmlContent.append("<a href='/actual_stats.html'>Team Data</a>");
-            htmlContent.append("<a href='/reports.html'>Reports</a>");
-            htmlContent.append("<a href='/teams.html'>Teams</a>");
-            htmlContent.append("<a class='active' href='/stats_query.html'>Stats Query</a>");
-            htmlContent.append("<a href='/admin.html'>Admin</a>");
-            htmlContent.append("<div class='clock' id='clock'></div>");
-            htmlContent.append("</div>");
-            htmlContent.append("<div class='container'>");
-            htmlContent.append("<h1>Team Matches</h1>");
-            htmlContent.append("<table border='1'>");
-            htmlContent.append("<tr>");
-            htmlContent.append("<th>Match</th>");
-            htmlContent.append("<th>Event</th>");
-            htmlContent.append("<th>Time</th>");
-            htmlContent.append("<th>Alliance</th>");
-            htmlContent.append("<th>Status</th>");
-            htmlContent.append("<th>EPA</th>");
-            htmlContent.append("<th>Auto EPA</th>");
-            htmlContent.append("<th>Teleop EPA</th>");
-            htmlContent.append("<th>Endgame EPA</th>");
-            htmlContent.append("<th>RP 1 EPA</th>");
-            htmlContent.append("<th>RP 2 EPA</th>");
-            htmlContent.append("<th>Post EPA</th>");
-            htmlContent.append("</tr>");
-
-            // Parse team match data and append rows to the table
-            Gson gson = new Gson();
-            JsonArray matchesArray = gson.fromJson(teamMatchData, JsonArray.class);
-            for (JsonElement matchElement : matchesArray) {
-                JsonObject matchObject = matchElement.getAsJsonObject();
-                htmlContent.append("<tr>");
-                htmlContent.append("<td>").append(getValueAsString(matchObject, "match")).append("</td>");
-                htmlContent.append("<td>").append(getValueAsString(matchObject, "event")).append("</td>");
-                htmlContent.append("<td>").append(getValueAsString(matchObject, "time")).append("</td>");
-                htmlContent.append("<td>").append(getValueAsString(matchObject, "alliance")).append("</td>");
-                htmlContent.append("<td>").append(getValueAsString(matchObject, "status")).append("</td>");
-                htmlContent.append("<td>").append(getValueAsDouble(matchObject, "epa")).append("</td>");
-                htmlContent.append("<td>").append(getValueAsDouble(matchObject, "auto_epa")).append("</td>");
-                htmlContent.append("<td>").append(getValueAsDouble(matchObject, "teleop_epa")).append("</td>");
-                htmlContent.append("<td>").append(getValueAsDouble(matchObject, "endgame_epa")).append("</td>");
-                htmlContent.append("<td>").append(getValueAsDouble(matchObject, "rp_1_epa")).append("</td>");
-                htmlContent.append("<td>").append(getValueAsDouble(matchObject, "rp_2_epa")).append("</td>");
-                htmlContent.append("<td>").append(getValueAsDouble(matchObject, "post_epa")).append("</td>");
-                htmlContent.append("</tr>");
-            }
-
-            htmlContent.append("</table>");
-            htmlContent.append("</div></body></html>");
-            return htmlContent.toString();
-        }
-
-        public static String getValueAsString(JsonObject jsonObject, String key) {
-            JsonElement element = jsonObject.get(key);
-            return (element != null && !element.isJsonNull()) ? element.getAsString() : "";
-        }
-
-        public static double getValueAsDouble(JsonObject jsonObject, String key) {
-            JsonElement element = jsonObject.get(key);
-            return (element != null && !element.isJsonNull()) ? element.getAsDouble() : 0.0;
-        }
-
-
-
-        private void sendResponse(HttpExchange exchange, String response) throws IOException {
-            exchange.getResponseHeaders().set("Content-Type", "text/html");
-            exchange.sendResponseHeaders(200, response.getBytes().length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
-        }
-    }
-
-    static class StatsQueryHttp implements HttpHandler {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            String requestURI = exchange.getRequestURI().toString();
-            if ("/team_matches".equals(requestURI)) {
-                TeamsHandler teamsHandler = new TeamsHandler();
-                teamsHandler.handle(exchange);
-            } else if ("/stats_query.html".equals(requestURI)) {
-                serveHtmlPage(exchange);
-            } else {
-                // Unsupported URI
-                exchange.sendResponseHeaders(404, 0);
-                exchange.close();
-            }
-        }
-
-        private void serveHtmlPage(HttpExchange exchange) throws IOException {
-            // Fetch team match data
-            String eventCode = Constants.TBA_API.TBA_EVENT;
-            String teamMatchData = TeamsHandler.fetchTeamMatchData(eventCode);
-            
-            // Generate HTML content
-            String htmlContent = TeamsHandler.generateHtmlPage(teamMatchData);
-
-            // Write HTML content to file
-            try (FileWriter writer = new FileWriter("stats_query.html")) {
-                writer.write(htmlContent);
+                // Close connection
+                connection.disconnect();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            // Serve the HTML content
-            exchange.getResponseHeaders().set("Content-Type", "text/html");
-            exchange.sendResponseHeaders(200, htmlContent.getBytes().length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(htmlContent.getBytes());
-            os.close();
+            return matchData.toString();
         }
 
+        public static void writeMatchesHtml(String matchData) {
+            try (PrintWriter htmlContent = new PrintWriter(new FileWriter("stats_query.html"))) {
+                // Parse JSON response
+                JsonArray matchesArray = JsonParser.parseString(matchData).getAsJsonArray();
+
+                // Write HTML content for matches
+                htmlContent.append("<html><head><title>Match Data</title>");
+                htmlContent.append("<link rel=\"stylesheet\" href=\"style.css\">");
+                htmlContent.append("</head><body>");
+                htmlContent.append("<div class='navbar'>");
+                htmlContent.append("<a href='/'>Home</a>");
+                htmlContent.append("<a href='/pit-scout.html'>Pits</a>");
+                htmlContent.append("<a href='/team_averages.html'>Team Averages</a>");
+                htmlContent.append("<a href='/actual_stats.html'>Team Data</a>");
+                htmlContent.append("<a href='/reports.html'>Reports</a>");
+                htmlContent.append("<a href='/teams.html'>Teams</a>");
+                htmlContent.append("<a class='active' href='/stats_query.html'>Stats Query</a>");
+                htmlContent.append("<a href='/admin.html'>Admin</a>");
+                htmlContent.append("<div class='clock' id='clock'></div>");
+                htmlContent.append("</div><div class='container'>");
+                htmlContent.append("<h1>Match List</h1>");
+                htmlContent.append("<center><p>Showing info from Statbotics.io for event ID: " + Constants.TBA_API.TBA_EVENT + "</p></center>");
+                htmlContent.append("<table class='table-test'>");
+                htmlContent.append("<tr><th>Match Key</th><th>Match Number</th><th>Red Team Numbers</th><th>Red EPA</th><th>Red RP 1 Prob</th><th>Red RP 2 Prob</th><th>Blue Team Numbers</th><th>Blue EPA</th><th>Blue RP 1 Prob</th><th>Blue RP 2 Prob</th></tr>");
+
+                Gson gson = new Gson();
+                for (JsonElement matchElement : matchesArray) {
+                    JsonObject matchObject = matchElement.getAsJsonObject();
+                    String matchKey = extractAfterEventKey(matchObject.get("key").getAsString(),Constants.TBA_API.TBA_EVENT+"_");
+                    String matchNumber = matchObject.get("match_number").getAsString();
+                    String redTeamNumbers = matchObject.get("red_1").getAsString() + ", " + matchObject.get("red_2").getAsString() + ", " + matchObject.get("red_3").getAsString();
+                    String redEPA = matchObject.get("red_epa_sum").getAsString();
+                    String redRP1Prob = formatPercentage(matchObject.get("red_rp_1_prob").getAsDouble());
+                    String redRP2Prob = formatPercentage(matchObject.get("red_rp_2_prob").getAsDouble());
+                    String blueTeamNumbers = matchObject.get("blue_1").getAsString() + ", " + matchObject.get("blue_2").getAsString() + ", " + matchObject.get("blue_3").getAsString();
+                    String blueEPA = matchObject.get("blue_epa_sum").getAsString();
+                    String blueRP1Prob = formatPercentage(matchObject.get("blue_rp_1_prob").getAsDouble());
+                    String blueRP2Prob = formatPercentage(matchObject.get("blue_rp_2_prob").getAsDouble());
+
+                    htmlContent.append("<tr>");
+                    htmlContent.append("<td>").append(matchKey).append("</td>");
+                    htmlContent.append("<td>").append(matchNumber).append("</td>");
+                    htmlContent.append("<td>").append(redTeamNumbers).append("</td>");
+                    htmlContent.append("<td>").append(redEPA).append("</td>");
+                    htmlContent.append("<td>").append(redRP1Prob).append("</td>");
+                    htmlContent.append("<td>").append(redRP2Prob).append("</td>");
+                    htmlContent.append("<td>").append(blueTeamNumbers).append("</td>");
+                    htmlContent.append("<td>").append(blueEPA).append("</td>");
+                    htmlContent.append("<td>").append(blueRP1Prob).append("</td>");
+                    htmlContent.append("<td>").append(blueRP2Prob).append("</td>");
+                    htmlContent.append("</tr>");
+                }
+
+                htmlContent.append("</table></div>");
+                htmlContent.append("<script src='script-no-pwd.js'></script>");
+                htmlContent.append("</body></html>");
+            } catch (IOException e) {
+                Utils.logMessage(e.getMessage());
+            }
+        }
+
+        private static String formatPercentage(double value) {
+            return String.format("%.2f%%", value * 100);
+        }
+        
+        public static String extractAfterEventKey(String input, String eventKey) {
+            int index = input.indexOf(eventKey);
+            if (index != -1) {
+                return input.substring(index + eventKey.length());
+            }
+            return "";
+        }
+
+
+
+        private static void sendMatchesHtmlToClient(HttpExchange exchange) throws IOException {
+            File file = new File("stats_query.html");
+            if (!file.exists()) {
+                exchange.sendResponseHeaders(404, 0);
+                exchange.close();
+                return;
+            }
+
+            exchange.sendResponseHeaders(200, file.length());
+            try (OutputStream os = exchange.getResponseBody(); FileInputStream fis = new FileInputStream(file)) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = fis.read(buffer)) != -1) {
+                    os.write(buffer, 0, bytesRead);
+                }
+            }
+        }
     }
 }
