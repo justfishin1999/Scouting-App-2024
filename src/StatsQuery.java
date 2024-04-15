@@ -97,7 +97,7 @@ public class StatsQuery {
                 htmlContent.append("<div class='clock' id='clock'></div>");
                 htmlContent.append("</div><div class='container'>");
                 htmlContent.append("<h1>Match List</h1>");
-                htmlContent.append("<center><p>Showing info from Statbotics.io for event ID: " + Constants.TBA_API.TBA_EVENT + "</p></center>");
+                htmlContent.append("<center><p>Showing info from <i><a href='https://statbotics.io/'>Statbotics.io</a></i> for event ID: " + Constants.TBA_API.TBA_EVENT + "</p></center>");
                 htmlContent.append("<table class='table-test'>");
                 htmlContent.append("<tr><th>Match Key</th><th>Match Number</th><th>Red Team Numbers</th><th>Red EPA</th><th>Red RP 1 Prob</th><th>Red RP 2 Prob</th><th>Blue Team Numbers</th><th>Blue EPA</th><th>Blue RP 1 Prob</th><th>Blue RP 2 Prob</th></tr>");
 
